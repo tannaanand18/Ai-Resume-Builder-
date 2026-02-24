@@ -14,26 +14,26 @@ def add_skill():
 
     resume_id = data.get("resume_id")
 
-    if not resume_id or not data.get("skill_name"):
-        return jsonify({"error": "resume_id and skill_name are required"}), 400
+    if not resume_id or not data.get("name"):
+        return jsonify({"error": "resume_id and name are required"}), 400
 
-    resume = Resume.query.filter_by(
-        id=resume_id,
-        user_id=int(user_id)
-    ).first()
-
+    resume = Resume.query.filter_by(id=resume_id, user_id=int(user_id)).first()
     if not resume:
         return jsonify({"error": "Invalid resume"}), 403
 
     skill = Skill(
         resume_id=resume_id,
-        skill_name=data.get("skill_name")
+        skill_name=data.get("name"),   # ✅ frontend sends "name"
+        level=data.get("level", "Intermediate")  # ✅ add level
     )
 
     db.session.add(skill)
     db.session.commit()
 
-    return jsonify({"message": "Skill added successfully"}), 201
+    return jsonify({
+        "message": "Skill added successfully",
+        "id": skill.id   # ✅ return id
+    }), 201
 
 
 @skill_bp.route("/<int:resume_id>", methods=["GET"])
@@ -41,11 +41,7 @@ def add_skill():
 def get_skills(resume_id):
     user_id = get_jwt_identity()
 
-    resume = Resume.query.filter_by(
-        id=resume_id,
-        user_id=int(user_id)
-    ).first()
-
+    resume = Resume.query.filter_by(id=resume_id, user_id=int(user_id)).first()
     if not resume:
         return jsonify({"error": "Invalid resume"}), 403
 
@@ -54,6 +50,25 @@ def get_skills(resume_id):
     return jsonify([
         {
             "id": skill.id,
-            "skill_name": skill.skill_name
+            "name": skill.skill_name,   # ✅ frontend expects "name"
+            "level": skill.level if hasattr(skill, 'level') else "Intermediate"
         } for skill in skills
     ]), 200
+
+
+@skill_bp.route("/<int:skill_id>", methods=["DELETE"])
+@jwt_required()
+def delete_skill(skill_id):
+    user_id = get_jwt_identity()
+
+    skill = Skill.query.get(skill_id)
+    if not skill:
+        return jsonify({"error": "Not found"}), 404
+
+    resume = Resume.query.filter_by(id=skill.resume_id, user_id=int(user_id)).first()
+    if not resume:
+        return jsonify({"error": "Unauthorized"}), 403
+
+    db.session.delete(skill)
+    db.session.commit()
+    return jsonify({"message": "Deleted"}), 200

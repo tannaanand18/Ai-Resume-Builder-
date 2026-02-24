@@ -15,7 +15,6 @@ export default function Dashboard() {
       headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
     });
     const data = await res.json();
-    console.log("resumes:", data); // check what comes back
     setResumes(Array.isArray(data) ? data : []);
   } catch (err) {
     console.error(err);
@@ -29,6 +28,8 @@ export default function Dashboard() {
  const createResume = () => {
   navigate("/resume/new");
 };
+
+   
 
   const duplicateResume = async (e, resume) => {
     e.stopPropagation();

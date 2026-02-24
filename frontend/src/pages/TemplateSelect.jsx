@@ -275,19 +275,46 @@ export default function TemplateSelect() {
   );
 
   const createWithTemplate = async (templateId) => {
-    try {
-      const res = await fetch("/api/resume/", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ title: "Untitled Resume", template_name: templateId }),
-      });
-      const data = await res.json();
-      navigate(`/resume/${data.resume_id}/edit`);
-    } catch (err) {
-      alert("Failed to create resume");
-    }
-  };
+  try {
+    const token = localStorage.getItem("token");
 
+    if (!token) {
+      alert("Session expired. Please login again.");
+      navigate("/login");
+      return;
+    }
+
+    const res = await fetch("/api/resume/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        title: "Untitled Resume",
+        template_name: templateId,
+      }),
+    });
+
+    if (!res.ok) {
+      const errorData = await res.json();
+      throw new Error(errorData?.error || "Failed to create resume");
+    }
+
+    const data = await res.json();
+
+    if (!data.resume_id) {
+      throw new Error("Invalid resume ID returned");
+    }
+
+    navigate(`/resume/${data.resume_id}/edit`);
+
+  } catch (err) {
+    console.error("Create resume error:", err);
+    alert("Failed to create resume. Please try again.");
+  }
+};
+   
   return (
     <div style={{ minHeight: "100vh", backgroundColor: "#f3f4f6" }}>
       <header style={{ backgroundColor: "#fff", borderBottom: "1px solid #e5e7eb", padding: "0 32px", height: 60, display: "flex", alignItems: "center", justifyContent: "space-between" }}>

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 
 const TABS = ["Personal", "Experience", "Education", "Skills", "Projects", "Certifications"];
 
@@ -184,25 +185,83 @@ export default function ResumeBuilder() {
     } catch (err) { console.error(err); }
   };
 
-  const saveResume = async () => {
-    setSaving(true);
-    try {
-      await fetch(`/api/resume/${id}`, { method: "PUT", headers, body: JSON.stringify(resume) });
-    } catch { alert("Failed to save"); }
-    finally { setSaving(false); }
-  };
-
-  const addItem = async (url, body, resetFn, type) => {
+ const saveResume = async () => {
   try {
-    const res = await fetch(url, { method: "POST", headers, body: JSON.stringify(body) });
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      alert("Session expired. Please login again.");
+      navigate("/login");
+      return;
+    }
+
+    const res = await fetch(`/api/resume/${id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(resume),
+    });
+
+    if (!res.ok) {
+      const errorData = await res.json();
+      throw new Error(errorData?.error || "Save failed");
+    }
+
+    alert("Resume saved successfully 🎉");
+
+  } catch (err) {
+    console.error("Save error:", err);
+    alert("Failed to save resume");
+  }
+};
+
+ const addItem = async (url, body, resetFn, type) => {
+  try {
+    const res = await fetch(url, {
+      method: "POST",
+      headers,
+      body: JSON.stringify(body)
+    });
+
     const data = await res.json();
+
+    // 🔴 IMPORTANT FIX
+    if (!res.ok) {
+      console.error("Backend error:", data);
+      toast.error(data.error || "Failed to add item");
+      return; // STOP if backend fails
+    }
+
     resetFn();
-    if (type === "experience") setExperiences(prev => [...prev, { ...body, id: data.id }]);
-    if (type === "education") setEducations(prev => [...prev, { ...body, id: data.id }]);
-    if (type === "skills") setSkills(prev => [...prev, { ...body, id: data.id }]);
-    if (type === "projects") setProjects(prev => [...prev, { ...body, id: data.id }]);
-    if (type === "certs") setCerts(prev => [...prev, { ...body, id: data.id }]);
-  } catch { alert("Failed to add"); }
+
+    if (type === "experience") {
+      setExperiences(prev => [...prev, { ...body, id: data.id }]);
+    }
+
+    if (type === "education") {
+      setEducations(prev => [...prev, { ...body, id: data.id }]);
+    }
+
+    if (type === "skills") {
+      setSkills(prev => [...prev, { ...body, id: data.id }]);
+    }
+
+    if (type === "projects") {
+      setProjects(prev => [...prev, { ...body, id: data.id }]);
+    }
+
+    if (type === "certs") {
+      setCerts(prev => [...prev, { ...body, id: data.id }]);
+    }
+
+    toast.success("Added successfully");
+
+  } catch (err) {
+    console.error(err);
+    toast.error("Failed to add");
+  }
 };
 
   const deleteItem = async (url, type, index) => {

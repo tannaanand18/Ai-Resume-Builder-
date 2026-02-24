@@ -3,7 +3,6 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 from app.extensions import db
 from app.models.experience import Experience
 from app.models.resume import Resume
-from datetime import datetime
 
 experience_bp = Blueprint("experience", __name__)
 
@@ -14,52 +13,33 @@ def add_experience():
     data = request.get_json()
 
     resume_id = data.get("resume_id")
-
     if not resume_id:
         return jsonify({"error": "resume_id is required"}), 400
 
-    resume = Resume.query.filter_by(
-        id=resume_id,
-        user_id=int(user_id)
-    ).first()
-
+    resume = Resume.query.filter_by(id=resume_id, user_id=int(user_id)).first()
     if not resume:
         return jsonify({"error": "Invalid resume"}), 403
 
     if not data.get("company") or not data.get("role") or not data.get("start_date"):
         return jsonify({"error": "company, role and start_date are required"}), 400
 
-    try:
-        start_date = datetime.strptime(
-            data.get("start_date"), "%Y-%m-%d"
-        ).date()
-    except Exception:
-        return jsonify({"error": "Invalid start_date format. Use YYYY-MM-DD"}), 400
-
-    end_date = None
-    if data.get("end_date"):
-        try:
-            end_date = datetime.strptime(
-                data.get("end_date"), "%Y-%m-%d"
-            ).date()
-        except Exception:
-            return jsonify({"error": "Invalid end_date format. Use YYYY-MM-DD"}), 400
-
-    # Replace the strict date parsing with flexible text storage
+    # ✅ NO date parsing — store as plain text
     experience = Experience(
-    resume_id=resume_id,
-    company=data.get("company"),
-    role=data.get("role"),
-    description=data.get("description"),
-    start_date=data.get("start_date"),   # ✅ no parsing needed
-    end_date=data.get("end_date"),       # ✅ store as text
-)
+        resume_id=resume_id,
+        company=data.get("company"),
+        role=data.get("role"),
+        description=data.get("description"),
+        start_date=data.get("start_date"),
+        end_date=data.get("end_date"),
+    )
 
     db.session.add(experience)
     db.session.commit()
 
-    return jsonify({"message": "Experience added successfully",
-                    "id": experience.id }), 201
+    return jsonify({
+        "message": "Experience added successfully",
+        "id": experience.id   # ✅ return id
+    }), 201
 
 
 @experience_bp.route("/<int:resume_id>", methods=["GET"])
@@ -67,17 +47,11 @@ def add_experience():
 def get_experience(resume_id):
     user_id = get_jwt_identity()
 
-    resume = Resume.query.filter_by(
-        id=resume_id,
-        user_id=int(user_id)
-    ).first()
-
+    resume = Resume.query.filter_by(id=resume_id, user_id=int(user_id)).first()
     if not resume:
         return jsonify({"error": "Invalid resume"}), 403
 
     experience_list = Experience.query.filter_by(resume_id=resume_id).all()
-
-    
 
     return jsonify([
         {
@@ -85,7 +59,25 @@ def get_experience(resume_id):
             "company": exp.company,
             "role": exp.role,
             "description": exp.description,
-            "start_date": exp.start_date,
-            "end_date": exp.end_date
+            "start_date": str(exp.start_date) if exp.start_date else "",
+            "end_date": str(exp.end_date) if exp.end_date else ""
         } for exp in experience_list
     ]), 200
+
+
+@experience_bp.route("/<int:experience_id>", methods=["DELETE"])
+@jwt_required()
+def delete_experience(experience_id):
+    user_id = get_jwt_identity()
+
+    experience = Experience.query.get(experience_id)
+    if not experience:
+        return jsonify({"error": "Not found"}), 404
+
+    resume = Resume.query.filter_by(id=experience.resume_id, user_id=int(user_id)).first()
+    if not resume:
+        return jsonify({"error": "Unauthorized"}), 403
+
+    db.session.delete(experience)
+    db.session.commit()
+    return jsonify({"message": "Deleted"}), 200

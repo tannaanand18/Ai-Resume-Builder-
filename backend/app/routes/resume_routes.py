@@ -43,13 +43,14 @@ def get_resumes():
     resumes = Resume.query.filter_by(user_id=int(user_id)).all()
 
     return jsonify([
-        {
-            "id": r.id,
-            "title": r.title,
-            "summary": r.summary,
-            "created_at": r.created_at
-        } for r in resumes
-    ]), 200
+    {
+        "id": r.id,
+        "title": r.title,
+        "summary": r.summary,
+        "created_at": r.created_at,
+        "updated_at": r.updated_at
+    } for r in resumes
+]), 200
 
 
 @resume_bp.route("/<int:resume_id>", methods=["GET"])
@@ -86,7 +87,8 @@ def get_resume(resume_id):
 @resume_bp.route("/<int:resume_id>", methods=["PUT"])
 @jwt_required()
 def update_resume(resume_id):
-    user_id = get_jwt_identity()
+    user_id = int(get_jwt_identity())
+    data = request.get_json()
 
     resume = Resume.query.filter_by(
         id=resume_id,
@@ -96,8 +98,8 @@ def update_resume(resume_id):
     if not resume:
         return jsonify({"error": "Resume not found"}), 404
 
-    data = request.get_json()
-
+    resume.title = data.get("title", resume.title)
+    resume.summary = data.get("summary", resume.summary)
     resume.full_name = data.get("full_name", resume.full_name)
     resume.professional_title = data.get("professional_title", resume.professional_title)
     resume.email = data.get("email", resume.email)
