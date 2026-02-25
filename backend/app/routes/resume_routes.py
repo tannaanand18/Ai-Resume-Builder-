@@ -79,6 +79,7 @@ def get_resume(resume_id):
     "website": resume.website,
     "nationality": resume.nationality,
     "date_of_birth": resume.date_of_birth,
+    "template_name": resume.template_name, 
     "created_at": resume.created_at,
     "updated_at": resume.updated_at
 }), 200
@@ -109,6 +110,7 @@ def update_resume(resume_id):
     resume.website = data.get("website", resume.website)
     resume.nationality = data.get("nationality", resume.nationality)
     resume.date_of_birth = data.get("date_of_birth", resume.date_of_birth)
+    resume.template_name = data.get("template_name", resume.template_name)
 
     db.session.commit()
 

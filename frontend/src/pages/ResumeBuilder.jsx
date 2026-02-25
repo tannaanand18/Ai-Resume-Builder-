@@ -502,7 +502,7 @@ export default function ResumeBuilder() {
       if (type === "experience") setExperiences(prev => prev.filter((_, i) => i !== index));
       if (type === "education") setEducations(prev => prev.filter((_, i) => i !== index));
       if (type === "skills") setSkills(prev => prev.filter((_, i) => i !== index));
-      if (type === "projects") setProjects(prev => prev.filter((_, i) => i !== index));
+      if (type === "projects") setProjects(prev => prev.filter((_, i) => i !== index)); 
       if (type === "certs") setCerts(prev => prev.filter((_, i) => i !== index));
     } catch { alert("Failed to delete"); }
   };
@@ -522,9 +522,30 @@ export default function ResumeBuilder() {
           <input value={resume.title} onChange={e => setResume({ ...resume, title: e.target.value })} placeholder="Resume Title"
             style={{ border: "none", outline: "none", fontSize: 14, fontWeight: 700, color: "#111827", background: "transparent", width: 200 }} />
         </div>
-        <button onClick={saveResume} disabled={saving} style={{ ...btn, padding: "7px 18px" }}>
-          {saving ? "Saving..." : "💾 Save"}
-        </button>
+        <div style={{ display: "flex", gap: 8 }}>
+  <button
+    onClick={async () => {
+      showToast("📄 Generating PDF...");
+      try {
+        const res = await fetch(`/api/resume/download/${id}`, { headers });
+        if (!res.ok) { showToast("❌ Failed to download"); return; }
+        const blob = await res.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `${resume.title || "resume"}.pdf`;
+        a.click();
+        window.URL.revokeObjectURL(url);
+        showToast("✅ PDF downloaded!");
+      } catch { showToast("❌ Failed to download"); }
+    }}
+    style={{ background: "#16a34a", color: "#fff", border: "none", borderRadius: 8, padding: "7px 18px", fontSize: 13, fontWeight: 600, cursor: "pointer" }}>
+    📄 Download PDF
+  </button>
+  <button onClick={saveResume} disabled={saving} style={{ ...btn, padding: "7px 18px" }}>
+    {saving ? "Saving..." : "💾 Save"}
+  </button>
+</div>
       </header>
 
       {toast && (
@@ -623,7 +644,47 @@ export default function ResumeBuilder() {
                     <div key={key}><label style={lbl}>{label}</label><input style={inp} placeholder={ph} value={expForm[key]} onChange={e => setExpForm({ ...expForm, [key]: e.target.value })} /></div>
                   ))}
                 </div>
-                <div style={fld}><label style={lbl}>Description</label><textarea style={{ ...inp, resize: "none" }} rows={3} placeholder="Describe responsibilities..." value={expForm.description} onChange={e => setExpForm({ ...expForm, description: e.target.value })} /></div>
+                <div style={fld}>
+  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
+    <label style={lbl}>Description</label>
+    <button
+      onClick={async () => {
+        if (!expForm.role || !expForm.company) {
+          showToast("❌ Please fill in Company and Role first!");
+          return;
+        }
+        showToast("✨ Generating description...");
+        try {
+          const res = await fetch("/api/ai/generate-experience", {
+            method: "POST",
+            headers,
+            body: JSON.stringify({
+              role: expForm.role,
+              company: expForm.company,
+              start_date: expForm.start_date,
+              end_date: expForm.end_date
+            })
+          });
+          const data = await res.json();
+          if (data.description) {
+            setExpForm(prev => ({ ...prev, description: data.description }));
+            showToast("✅ Description generated!");
+          } else {
+            showToast("❌ Failed to generate");
+          }
+        } catch {
+          showToast("❌ Failed to generate");
+        }
+      }}
+      style={{ background: "linear-gradient(135deg, #6366f1, #8b5cf6)", color: "#fff", border: "none", borderRadius: 20, padding: "5px 14px", fontSize: 12, fontWeight: 600, cursor: "pointer" }}>
+      ✨ Generate with AI
+    </button>
+  </div>
+  <textarea style={{ ...inp, resize: "none" }} rows={3}
+    placeholder="Describe responsibilities or click ✨ Generate with AI..."
+    value={expForm.description}
+    onChange={e => setExpForm({ ...expForm, description: e.target.value })} />
+</div>
                 <button style={btn} onClick={() => addItem(`/api/experience/`, { ...expForm, resume_id: parseInt(id) }, () => setExpForm({ company: "", role: "", start_date: "", end_date: "", description: "" }), "experience")}>+ Add Experience</button>
               </div>
             )}
@@ -686,7 +747,45 @@ export default function ResumeBuilder() {
                     <div key={key}><label style={lbl}>{label}</label><input style={inp} placeholder={ph} value={projForm[key]} onChange={e => setProjForm({ ...projForm, [key]: e.target.value })} /></div>
                   ))}
                 </div>
-                <div style={fld}><label style={lbl}>Description</label><textarea style={{ ...inp, resize: "none" }} rows={3} placeholder="Describe the project..." value={projForm.description} onChange={e => setProjForm({ ...projForm, description: e.target.value })} /></div>
+                <div style={fld}>
+  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
+    <label style={lbl}>Description</label>
+    <button
+      onClick={async () => {
+        if (!projForm.title) {
+          showToast("❌ Please fill in Project Title first!");
+          return;
+        }
+        showToast("✨ Generating description...");
+        try {
+          const res = await fetch("/api/ai/generate-project", {
+            method: "POST",
+            headers,
+            body: JSON.stringify({
+              title: projForm.title,
+              tech_stack: projForm.tech_stack
+            })
+          });
+          const data = await res.json();
+          if (data.description) {
+            setProjForm(prev => ({ ...prev, description: data.description }));
+            showToast("✅ Description generated!");
+          } else {
+            showToast("❌ Failed to generate");
+          }
+        } catch {
+          showToast("❌ Failed to generate");
+        }
+      }}
+      style={{ background: "linear-gradient(135deg, #6366f1, #8b5cf6)", color: "#fff", border: "none", borderRadius: 20, padding: "5px 14px", fontSize: 12, fontWeight: 600, cursor: "pointer" }}>
+      ✨ Generate with AI
+    </button>
+  </div>
+  <textarea style={{ ...inp, resize: "none" }} rows={3}
+    placeholder="Describe the project or click ✨ Generate with AI..."
+    value={projForm.description}
+    onChange={e => setProjForm({ ...projForm, description: e.target.value })} />
+</div>
                 <button style={btn} onClick={() => addItem(`/api/projects/`, { ...projForm, resume_id: parseInt(id) }, () => setProjForm({ title: "", description: "", tech_stack: "", link: "" }), "projects")}>+ Add Project</button>
               </div>
             )}
