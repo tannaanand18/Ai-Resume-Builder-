@@ -17,6 +17,7 @@ class Education(db.Model):
     institution = db.Column(db.String(255), nullable=False)
     start_year = db.Column(db.Integer, nullable=False)
     end_year = db.Column(db.Integer, nullable=True)
+    score = db.Column(db.String(50), nullable=True)
 
     created_at = db.Column(
         db.DateTime,

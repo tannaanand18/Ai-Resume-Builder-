@@ -40,3 +40,12 @@
 .read-the-docs {
   color: #888;
 }
+
+/* Add this to your main CSS file (like index.css) */
+@media print {
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+   
+  }
+}

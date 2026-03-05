@@ -20,7 +20,7 @@ export default function Login() {
     console.log("Login response:", data);
     data.email = form.email;
     login(data);  // ✅ pass full Flask response to login()
-    navigate("/dashboard");
+    navigate("/dashboard", { replace: true });
   } catch (err) {
     alert("Login failed");
     console.log(err);

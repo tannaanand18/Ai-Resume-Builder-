@@ -27,7 +27,8 @@ def add_education():
         degree=data.get("degree"),
         institution=data.get("institution"),
         start_year=data.get("start_year"),
-        end_year=data.get("end_year")
+        end_year=data.get("end_year"),
+        score=data.get('score')
     )
 
     db.session.add(education)
@@ -57,6 +58,23 @@ def get_education(resume_id):
             "degree": edu.degree,
             "institution": edu.institution,
             "start_year": edu.start_year,
-            "end_year": edu.end_year
+            "end_year": edu.end_year,
+            "score": edu.score
         } for edu in education_list
     ]), 200
+
+@education_bp.route("/<int:edu_id>", methods=["DELETE"])
+@jwt_required()
+def delete_education(edu_id):
+    # Find the specific education entry in the database by its ID
+    education = Education.query.get(edu_id)
+    
+    # If it doesn't exist, tell the frontend we couldn't find it
+    if not education:
+        return jsonify({"error": "Education entry not found"}), 404
+
+    # Delete it from the database and save the changes
+    db.session.delete(education)
+    db.session.commit()
+
+    return jsonify({"message": "Education deleted successfully"}), 200

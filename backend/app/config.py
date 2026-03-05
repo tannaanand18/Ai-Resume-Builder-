@@ -1,5 +1,6 @@
 import os
 from dotenv import load_dotenv
+from datetime import timedelta
 
 load_dotenv()
 
@@ -9,3 +10,5 @@ class Config:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY", "jwtsecret")
     GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+
+    JWT_ACCESS_TOKEN_EXPIRES = timedelta(days=7)
