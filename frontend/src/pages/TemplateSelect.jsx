@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 /* ================================
@@ -1071,86 +1071,48 @@ function MiniResume({ template }) {
 }
 
 /* ================================
-   SMALL UI HELPERS
-================================ */
-
-const card = {
-  width: 165,
-  background: "#fff",
-  borderRadius: 6,
-  boxShadow: "0 2px 16px rgba(0,0,0,0.13)",
-  overflow: "hidden",
-  fontFamily: "sans-serif",
-};
-
-const title = {
-  fontSize: 9,
-  fontWeight: 800,
-  color: "#111",
-};
-
-const subtitle = {
-  fontSize: 6,
-  color: "#555",
-  marginTop: 2,
-};
-
-const content = {
-  padding: "8px 10px",
-};
-
-const smallLine = {
-  height: 4,
-  background: "#e5e7eb",
-  marginTop: 2,
-};
-
-const blueSection = {
-  fontSize: 6,
-  fontWeight: 700,
-  color: "#2563eb",
-  borderBottom: "1px solid #2563eb",
-};
-
-const pinkSection = {
-  fontSize: 6,
-  fontWeight: 700,
-  color: "#ec4899",
-  borderBottom: "1px solid #ec4899",
-};
-
-function Section({ title }) {
-  return (
-    <div style={{ marginBottom: 5 }}>
-      <div style={{ fontSize: 6, fontWeight: 700 }}>{title}</div>
-      <div style={smallLine}></div>
-    </div>
-  );
-}
-
-/* ================================
    MAIN COMPONENT
 ================================ */
+
+const CATEGORY_INFO = {
+  Simple: { icon: "📄", color: "#059669", desc: "Clean, traditional layouts perfect for corporate roles" },
+  Modern: { icon: "✨", color: "#2563eb", desc: "Contemporary designs with sidebars and columns" },
+  Creative: { icon: "🎨", color: "#9333ea", desc: "Bold, eye-catching templates that stand out" },
+};
 
 export default function TemplateSelect() {
   const navigate = useNavigate();
   const [activeFilter, setActiveFilter] = useState("All Templates");
+  const [search, setSearch] = useState("");
+  const [loaded, setLoaded] = useState(false);
 
-  const filteredTemplates = activeFilter === "All Templates" 
-  ? TEMPLATES 
-  : TEMPLATES.filter(t => t.tag === activeFilter);
+  useEffect(() => {
+    const t = setTimeout(() => setLoaded(true), 50);
+    return () => clearTimeout(t);
+  }, []);
 
-  const createWithTemplate = async (templateId,templateStyle) => {
+  const filteredTemplates = TEMPLATES.filter(t => {
+    const matchFilter = activeFilter === "All Templates" || t.tag === activeFilter;
+    const matchSearch = !search || t.name.toLowerCase().includes(search.toLowerCase()) || t.description.toLowerCase().includes(search.toLowerCase()) || t.tag.toLowerCase().includes(search.toLowerCase());
+    return matchFilter && matchSearch;
+  });
+
+  const counts = {
+    "All Templates": TEMPLATES.length,
+    Simple: TEMPLATES.filter(t => t.tag === "Simple").length,
+    Modern: TEMPLATES.filter(t => t.tag === "Modern").length,
+    Creative: TEMPLATES.filter(t => t.tag === "Creative").length,
+  };
+
+  const createWithTemplate = async (templateId, templateStyle) => {
     try {
       const token = localStorage.getItem("token");
-
       if (!token) {
         alert("Session expired. Please login again.");
         navigate("/login");
         return;
       }
-      
-      console.log("🚀 Creating resume:", { templateId, templateStyle });
+
       const res = await fetch("/api/resume/", {
         method: "POST",
         headers: {
@@ -1165,12 +1127,7 @@ export default function TemplateSelect() {
       });
 
       const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data?.error || "Failed to create resume");
-      }
-      console.log("✅ Resume created:", data);
-
+      if (!res.ok) throw new Error(data?.error || "Failed to create resume");
       navigate(`/resume/${data.resume_id}/edit`);
     } catch (err) {
       console.error("Create resume error:", err);
@@ -1178,123 +1135,323 @@ export default function TemplateSelect() {
     }
   };
 
- return (
-    <div style={{ minHeight: "100vh", backgroundColor: "#f3f4f6" }}>
-      <header style={{ 
-  backgroundColor: "rgba(255, 255, 255, 0.8)", 
-  backdropFilter: "blur(12px)", // Modern glass effect
-  borderBottom: "1px solid #e5e7eb", 
-  padding: "0 32px", 
-  height: 64, 
-  display: "flex", 
-  alignItems: "center", 
-  justifyContent: "space-between",
-  position: "sticky",
-  top: 0,
-  zIndex: 50
-}}>
-  <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-    <div style={{ 
-      width: 34, 
-      height: 34, 
-      borderRadius: 10, 
-      background: "linear-gradient(135deg, #3b82f6, #14b8a6)", 
-      display: "flex", 
-      alignItems: "center", 
-      justifyContent: "center",
-      boxShadow: "0 4px 12px rgba(59, 130, 246, 0.3)"
-    }}>
-      <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="white" strokeWidth="2.5">
-        <path d="M7 8h10M7 12h6M7 16h8M5 3h14a2 2 0 012 2v14a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2z" strokeLinecap="round"/>
-      </svg>
-    </div>
-    <span style={{ fontWeight: 800, fontSize: 20, color: "#111827", letterSpacing: "-0.03em" }}>ResumeAI</span>
-  </div>
+  return (
+    <div style={{ minHeight: "100vh", background: "linear-gradient(135deg, #f0f4ff 0%, #faf5ff 50%, #f0fdf4 100%)" }}>
+      {/* Injected CSS animations */}
+      <style>{`
+        @keyframes fadeUp {
+          from { opacity: 0; transform: translateY(24px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        @keyframes slideDown {
+          from { opacity: 0; transform: translateY(-12px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes shimmer {
+          0% { background-position: -200% center; }
+          100% { background-position: 200% center; }
+        }
+        .ts-card {
+          cursor: pointer;
+          border-radius: 16px;
+          overflow: hidden;
+          border: 2px solid transparent;
+          background: #fff;
+          transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+          box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04);
+          position: relative;
+        }
+        .ts-card:hover {
+          border-color: #818cf8;
+          transform: translateY(-6px) scale(1.01);
+          box-shadow: 0 20px 48px rgba(99,102,241,0.15), 0 8px 24px rgba(0,0,0,0.08);
+        }
+        .ts-card .ts-overlay {
+          position: absolute;
+          inset: 0;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background: transparent;
+          transition: background 0.3s ease;
+          z-index: 2;
+        }
+        .ts-card:hover .ts-overlay {
+          background: rgba(99,102,241,0.08);
+        }
+        .ts-card .ts-use-btn {
+          opacity: 0;
+          transform: translateY(8px);
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .ts-card:hover .ts-use-btn {
+          opacity: 1;
+          transform: translateY(0);
+        }
+        .ts-filter-btn {
+          padding: 10px 22px;
+          border-radius: 50px;
+          border: 1.5px solid #e5e7eb;
+          cursor: pointer;
+          font-weight: 600;
+          font-size: 13.5px;
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          font-family: inherit;
+          outline: none;
+        }
+        .ts-filter-btn:hover {
+          border-color: #a5b4fc;
+          background: #eef2ff !important;
+          color: #4338ca !important;
+        }
+        .ts-search-input {
+          width: 100%;
+          padding: 14px 20px 14px 48px;
+          border-radius: 14px;
+          border: 2px solid #e5e7eb;
+          font-size: 15px;
+          font-family: inherit;
+          outline: none;
+          background: rgba(255,255,255,0.8);
+          backdrop-filter: blur(8px);
+          transition: all 0.3s ease;
+          color: #1f2937;
+        }
+        .ts-search-input::placeholder { color: #9ca3af; }
+        .ts-search-input:focus {
+          border-color: #818cf8;
+          box-shadow: 0 0 0 4px rgba(129,140,248,0.12);
+          background: #fff;
+        }
+        .ts-back-btn {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          background: transparent;
+          border: 1.5px solid #e5e7eb;
+          border-radius: 12px;
+          padding: 9px 20px;
+          font-size: 13.5px;
+          font-weight: 600;
+          cursor: pointer;
+          color: #374151;
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+          outline: none;
+          font-family: inherit;
+        }
+        .ts-back-btn:hover {
+          background: #f9fafb;
+          border-color: #818cf8;
+          color: #4f46e5;
+        }
+        .ts-back-btn:hover .btn-arrow { transform: translateX(-4px); }
+      `}</style>
 
-  <button 
-    onClick={() => navigate("/dashboard")}
-    onMouseEnter={(e) => {
-      const btn = e.currentTarget;
-      const arrow = btn.querySelector('.btn-arrow');
-      btn.style.backgroundColor = "#f9fafb";
-      btn.style.borderColor = "#3b82f6";
-      btn.style.color = "#3b82f6";
-      if (arrow) arrow.style.transform = "translateX(-5px)";
-    }}
-    onMouseLeave={(e) => {
-      const btn = e.currentTarget;
-      const arrow = btn.querySelector('.btn-arrow');
-      btn.style.backgroundColor = "transparent";
-      btn.style.borderColor = "#e5e7eb";
-      btn.style.color = "#374151";
-      if (arrow) arrow.style.transform = "translateX(0)";
-    }}
-    style={{ 
-      display: "flex",
-      alignItems: "center",
-      gap: "10px",
-      background: "transparent", 
-      border: "1.5px solid #e5e7eb", 
-      borderRadius: "10px", 
-      padding: "9px 20px", 
-      fontSize: "13.5px", 
-      fontWeight: "600",
-      cursor: "pointer", 
-      color: "#374151",
-      transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)", 
-      outline: "none"
-    }}
-  >
-    <div className="btn-arrow" style={{ transition: "transform 0.3s ease", display: "flex", alignItems: "center" }}>
-      <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
-        <path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-      </svg>
-    </div>
-    <span>Back to Dashboard</span>
-  </button>
-</header>
+      {/* Header */}
+      <header style={{
+        backgroundColor: "rgba(255, 255, 255, 0.7)",
+        backdropFilter: "blur(16px)",
+        borderBottom: "1px solid rgba(229,231,235,0.6)",
+        padding: "0 32px",
+        height: 64,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        position: "sticky",
+        top: 0,
+        zIndex: 50,
+        animation: "slideDown 0.5s ease"
+      }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <div style={{
+            width: 34, height: 34, borderRadius: 10,
+            background: "linear-gradient(135deg, #6366f1, #8b5cf6)",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            boxShadow: "0 4px 14px rgba(99,102,241,0.35)"
+          }}>
+            <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="white" strokeWidth="2.5">
+              <path d="M7 8h10M7 12h6M7 16h8M5 3h14a2 2 0 012 2v14a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2z" strokeLinecap="round"/>
+            </svg>
+          </div>
+          <span style={{ fontWeight: 800, fontSize: 20, color: "#111827", letterSpacing: "-0.03em" }}>ResumeAI</span>
+        </div>
+        <button className="ts-back-btn" onClick={() => navigate("/dashboard")}>
+          <div className="btn-arrow" style={{ transition: "transform 0.3s ease", display: "flex", alignItems: "center" }}>
+            <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+          </div>
+          <span>Back to Dashboard</span>
+        </button>
+      </header>
 
-      <main style={{ maxWidth: 1200, margin: "0 auto", padding: "48px 24px" }}>
-        <div style={{ textAlign: "center", marginBottom: 40 }}>
-          <h1 style={{ fontSize: 34, fontWeight: 800, color: "#111827", margin: "0 0 10px" }}>Start building your resume</h1>
-          <p style={{ color: "#6b7280", fontSize: 16 }}>Choose a design you like. You can customize it later.</p>
+      <main style={{ maxWidth: 1200, margin: "0 auto", padding: "56px 24px 80px" }}>
+
+        {/* Hero */}
+        <div style={{
+          textAlign: "center", marginBottom: 48,
+          animation: loaded ? "fadeUp 0.6s ease both" : "none"
+        }}>
+          <div style={{
+            display: "inline-block", padding: "6px 16px", borderRadius: 50,
+            background: "linear-gradient(135deg, rgba(99,102,241,0.1), rgba(139,92,246,0.1))",
+            color: "#6366f1", fontSize: 13, fontWeight: 700, marginBottom: 16, letterSpacing: "0.04em"
+          }}>
+            {TEMPLATES.length} PROFESSIONAL TEMPLATES
+          </div>
+          <h1 style={{
+            fontSize: 40, fontWeight: 800, color: "#111827", margin: "0 0 12px",
+            letterSpacing: "-0.03em", lineHeight: 1.15
+          }}>
+            Choose Your Perfect Template
+          </h1>
+          <p style={{ color: "#6b7280", fontSize: 17, maxWidth: 480, margin: "0 auto", lineHeight: 1.6 }}>
+            Pick a design that matches your style. Every template is fully customizable.
+          </p>
         </div>
 
-        <div style={{ display: "flex", gap: 10, justifyContent: "center", marginBottom: 40 }}>
-          {FILTERS.map((f) => (
-            <button key={f} onClick={() => setActiveFilter(f)}
-              style={{ padding: "10px 24px", borderRadius: 30, border: "1px solid #e5e7eb", cursor: "pointer", fontWeight: 600, fontSize: 14, transition: "all 0.2s",
-                backgroundColor: activeFilter === f ? "#111827" : "#fff",
-                color: activeFilter === f ? "#fff" : "#374151" }}>
-              {f}
-            </button>
-          ))}
+        {/* Search Bar */}
+        <div style={{
+          maxWidth: 480, margin: "0 auto 36px", position: "relative",
+          animation: loaded ? "fadeUp 0.6s ease 0.1s both" : "none"
+        }}>
+          <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="#9ca3af" strokeWidth="2"
+            style={{ position: "absolute", left: 16, top: "50%", transform: "translateY(-50%)", pointerEvents: "none" }}>
+            <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" strokeLinecap="round" />
+          </svg>
+          <input
+            className="ts-search-input"
+            type="text"
+            placeholder="Search templates by name, style, or category..."
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+          />
+          {search && (
+            <button onClick={() => setSearch("")} style={{
+              position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)",
+              background: "#f3f4f6", border: "none", borderRadius: "50%", width: 24, height: 24,
+              display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer",
+              color: "#6b7280", fontSize: 14, fontWeight: 700
+            }}>✕</button>
+          )}
         </div>
 
-        {/* 4 per row grid — scrollable with rows */}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 24 }}>
-          {filteredTemplates.map((t, index) => (  // ✅ Add index here
-            <div key={`${t.style}-${index}`}
-              onClick={() => createWithTemplate(t.id,t.style)}
-              style={{ cursor: "pointer", borderRadius: 14, overflow: "hidden", border: "2px solid #e5e7eb", transition: "all 0.2s", background: "#fff" }}
-              onMouseEnter={e => { e.currentTarget.style.borderColor = "#2563eb"; e.currentTarget.style.transform = "translateY(-4px)"; e.currentTarget.style.boxShadow = "0 12px 32px rgba(0,0,0,0.12)"; }}
-              onMouseLeave={e => { e.currentTarget.style.borderColor = "#e5e7eb"; e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none"; }}>
+        {/* Filter Pills */}
+        <div style={{
+          display: "flex", gap: 10, justifyContent: "center", marginBottom: 44, flexWrap: "wrap",
+          animation: loaded ? "fadeUp 0.6s ease 0.2s both" : "none"
+        }}>
+          {FILTERS.map((f) => {
+            const isActive = activeFilter === f;
+            return (
+              <button key={f} className="ts-filter-btn" onClick={() => setActiveFilter(f)}
+                style={{
+                  backgroundColor: isActive ? "#4f46e5" : "#fff",
+                  color: isActive ? "#fff" : "#374151",
+                  borderColor: isActive ? "#4f46e5" : "#e5e7eb",
+                  boxShadow: isActive ? "0 4px 14px rgba(79,70,229,0.3)" : "0 1px 3px rgba(0,0,0,0.04)",
+                }}>
+                {f !== "All Templates" && <span>{CATEGORY_INFO[f]?.icon}</span>}
+                <span>{f}</span>
+                <span style={{
+                  fontSize: 11, fontWeight: 700, padding: "2px 8px", borderRadius: 20,
+                  background: isActive ? "rgba(255,255,255,0.2)" : "#f3f4f6",
+                  color: isActive ? "#fff" : "#9ca3af"
+                }}>{counts[f]}</span>
+              </button>
+            );
+          })}
+        </div>
 
-              <div style={{ height: 300, background: "#f9fafb", display: "flex", alignItems: "center", justifyContent: "center", position: "relative", overflow: "hidden" }}>
-                <MiniResume template={t} />
-                <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center" }}
-                  onMouseEnter={e => { e.currentTarget.style.background = "rgba(37,99,235,0.08)"; e.currentTarget.querySelector("div").style.opacity = 1; }}
-                  onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.querySelector("div").style.opacity = 0; }}>
-                  <div style={{ background: "#2563eb", color: "#fff", padding: "10px 20px", borderRadius: 8, fontWeight: 600, fontSize: 14, opacity: 0, transition: "opacity 0.2s" }}>
-                    Use This Template
+        {/* Category description */}
+        {activeFilter !== "All Templates" && CATEGORY_INFO[activeFilter] && (
+          <div style={{
+            textAlign: "center", marginBottom: 32, animation: "fadeIn 0.3s ease",
+            color: CATEGORY_INFO[activeFilter].color, fontSize: 14, fontWeight: 600
+          }}>
+            {CATEGORY_INFO[activeFilter].desc}
+          </div>
+        )}
+
+        {/* Empty State */}
+        {filteredTemplates.length === 0 && (
+          <div style={{
+            textAlign: "center", padding: "60px 20px", animation: "fadeIn 0.3s ease"
+          }}>
+            <div style={{ fontSize: 48, marginBottom: 16 }}>🔍</div>
+            <div style={{ fontSize: 18, fontWeight: 700, color: "#374151", marginBottom: 8 }}>No templates found</div>
+            <div style={{ fontSize: 14, color: "#9ca3af" }}>Try a different search term or filter.</div>
+          </div>
+        )}
+
+        {/* Template Grid */}
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))", gap: 28 }}>
+          {filteredTemplates.map((t, index) => (
+            <div
+              key={`${t.style}-${index}`}
+              className="ts-card"
+              onClick={() => createWithTemplate(t.id, t.style)}
+              style={{
+                animation: loaded ? `fadeUp 0.5s ease ${0.08 * index}s both` : "none",
+              }}
+            >
+              {/* Preview Area */}
+              <div style={{
+                height: 310, background: "linear-gradient(180deg, #fafafe 0%, #f3f4f8 100%)",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                position: "relative", overflow: "hidden"
+              }}>
+                <div style={{ transform: "scale(1.15)", transition: "transform 0.4s ease" }}>
+                  <MiniResume template={t} />
+                </div>
+                <div className="ts-overlay">
+                  <div className="ts-use-btn" style={{
+                    background: "linear-gradient(135deg, #6366f1, #8b5cf6)",
+                    color: "#fff", padding: "12px 28px", borderRadius: 12,
+                    fontWeight: 700, fontSize: 14, letterSpacing: "0.02em",
+                    boxShadow: "0 8px 24px rgba(99,102,241,0.35)",
+                    display: "flex", alignItems: "center", gap: 8
+                  }}>
+                    <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+                    </svg>
+                    Use Template
                   </div>
                 </div>
               </div>
 
-              <div style={{ padding: "14px 16px", borderTop: "1px solid #f3f4f6" }}>
+              {/* Card Footer */}
+              <div style={{
+                padding: "14px 18px 16px",
+                borderTop: "1px solid #f0f1f5"
+              }}>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                  <span style={{ fontWeight: 700, fontSize: 13, color: "#111827", textTransform: "uppercase", letterSpacing: "0.04em" }}>{t.name}</span>
-                  <span style={{ fontSize: 11, fontWeight: 600, color: "#6b7280", background: "#f3f4f6", borderRadius: 20, padding: "2px 10px" }}>{t.tag}</span>
+                  <div>
+                    <div style={{ fontWeight: 700, fontSize: 14, color: "#111827", letterSpacing: "0.01em" }}>
+                      {t.name}
+                    </div>
+                    <div style={{ fontSize: 12, color: "#9ca3af", marginTop: 3 }}>
+                      {t.description}
+                    </div>
+                  </div>
+                  <span style={{
+                    fontSize: 11, fontWeight: 600, padding: "4px 12px", borderRadius: 20, flexShrink: 0,
+                    background: activeFilter !== "All Templates"
+                      ? `${CATEGORY_INFO[t.tag]?.color}12`
+                      : "#f3f4f6",
+                    color: activeFilter !== "All Templates"
+                      ? CATEGORY_INFO[t.tag]?.color
+                      : "#6b7280",
+                  }}>
+                    {t.tag}
+                  </span>
                 </div>
               </div>
             </div>

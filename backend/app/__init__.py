@@ -12,6 +12,7 @@ from .routes.skills_routes import skill_bp
 from .routes.project_routes import project_bp
 from .routes.certification_routes import certification_bp
 from .routes.ai_routes import ai_bp
+from .routes.admin_routes import admin_bp
 
 
 def create_app():
@@ -42,5 +43,6 @@ def create_app():
     app.register_blueprint(project_bp, url_prefix="/api/projects")
     app.register_blueprint(certification_bp, url_prefix="/api/certifications")
     app.register_blueprint(ai_bp, url_prefix="/api/ai")
+    app.register_blueprint(admin_bp, url_prefix="/api/admin")
 
     return app

@@ -1,8 +1,35 @@
-import { useEffect, useState, useRef } from "react"; // ✅ Perfect!
+import { useEffect, useLayoutEffect, useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import html2pdf from "html2pdf.js";
+import html2canvas from "html2canvas";
+import { jsPDF } from "jspdf";
 
 const TABS = ["Personal", "Experience", "Education", "Skills", "Projects", "Certifications"];
+
+const TEMPLATE_OPTIONS = [
+  { group: "Simple", items: [
+    { name: "Classic", style: "classic" },
+    { name: "Harvard", style: "minimal" },
+    { name: "Banking", style: "finance" },
+    { name: "Quiet Blue", style: "quiet_blue" },
+    { name: "Anna Field", style: "annafield" },
+  ]},
+  { group: "Modern", items: [
+    { name: "Modern", style: "sidebar" },
+    { name: "Simply Blue", style: "simplyblue_modern" },
+    { name: "Hunter Green", style: "hunter_green" },
+    { name: "Silver", style: "silver" },
+    { name: "Slate Dawn", style: "slate_dawn" },
+  ]},
+  { group: "Creative", items: [
+    { name: "Creative", style: "creative" },
+    { name: "Black Pattern", style: "black_pattern" },
+    { name: "Atlantic Blue", style: "atlantic_blue" },
+    { name: "Green Accent", style: "green_accent" },
+    { name: "Rosewood", style: "rosewood" },
+    { name: "Blue Accent", style: "blue_accent" },
+  ]},
+];
 
 // ── 12 UNIQUE ATS-FRIENDLY TEMPLATE RENDERERS ──
 
@@ -2328,26 +2355,6 @@ function EmptyState({ resume, experiences, educations }) {
 }
 
 // ── TEMPLATE MAP ──
-// ── TEMPLATE OPTIONS for the switcher dropdown ──
-const TEMPLATE_OPTIONS = [
-  { label: "Classic", style: "classic", category: "Simple" },
-  { label: "Harvard", style: "minimal", category: "Simple" },
-  { label: "Banking", style: "finance", category: "Simple" },
-  { label: "Quiet Blue", style: "quiet_blue", category: "Simple" },
-  { label: "Anna Field", style: "annafield", category: "Simple" },
-  { label: "Modern (Sidebar)", style: "sidebar", category: "Modern" },
-  { label: "Simply Blue", style: "simplyblue_modern", category: "Modern" },
-  { label: "Hunter Green", style: "hunter_green", category: "Modern" },
-  { label: "Silver", style: "silver", category: "Modern" },
-  { label: "Slate Dawn", style: "slate_dawn", category: "Modern" },
-  { label: "Creative", style: "creative", category: "Creative" },
-  { label: "Black Pattern", style: "black_pattern", category: "Creative" },
-  { label: "Atlantic Blue", style: "atlantic_blue", category: "Creative" },
-  { label: "Green Accent", style: "green_accent", category: "Creative" },
-  { label: "Rosewood", style: "rosewood", category: "Creative" },
-  { label: "Blue Accent", style: "blue_accent", category: "Creative" },
-];
-
 const TEMPLATE_MAP = {
   corporate: TemplateCorporate,
   modern: TemplateModern,
@@ -2401,20 +2408,61 @@ export default function ResumeBuilder() {
   const { id } = useParams();
   const navigate = useNavigate();
   const componentRef = useRef(null);
-  const handlePrint = () => {
-    const element = componentRef.current;
-    
-    // Configuration for a perfect A4 PDF download
-    const opt = {
-      margin:       0,
-      filename:     `${resume.full_name || 'My'}_Resume.pdf`,
-      image:        { type: 'jpeg', quality: 1.0 },
-      html2canvas:  { scale: 2, useCORS: true,scrollY: 0}, // Scale 2 keeps it HD!
-      jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
-    };
+  const innerRef = useRef(null);
 
-    // Triggers the real browser download instantly
-    html2pdf().set(opt).from(element).save();
+  // Auto-scale resume content to fit exactly one A4 page
+  useLayoutEffect(() => {
+    const wrapper = componentRef.current;
+    const inner = innerRef.current;
+    if (!wrapper || !inner) return;
+    // Reset to measure natural height
+    inner.style.transform = '';
+    inner.style.transformOrigin = '';
+    inner.style.width = '';
+    const contentH = inner.scrollHeight;
+    const maxH = wrapper.clientHeight;
+    if (contentH > maxH) {
+      const s = maxH / contentH;
+      inner.style.transform = `scale(${s})`;
+      inner.style.transformOrigin = 'top left';
+      inner.style.width = `${100 / s}%`;
+    }
+  });
+
+  const handlePrint = async () => {
+    const inner = innerRef.current;
+    // Save current preview styles
+    const savedTransform = inner.style.transform;
+    const savedOrigin = inner.style.transformOrigin;
+    const savedWidth = inner.style.width;
+    // Reset transform for accurate full-size capture
+    inner.style.transform = 'none';
+    inner.style.transformOrigin = '';
+    inner.style.width = '';
+    await new Promise(r => setTimeout(r, 150));
+    try {
+      // Capture the full content at natural size
+      const canvas = await html2canvas(inner, {
+        scale: 2, useCORS: true, scrollY: 0, backgroundColor: '#ffffff'
+      });
+      // Create single-page A4 PDF by fitting the image
+      const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+      const A4W = 210, A4H = 297;
+      const ratio = canvas.height / canvas.width;
+      let w = A4W, h = A4W * ratio;
+      if (h > A4H) { h = A4H; w = A4H / ratio; }
+      const x = (A4W - w) / 2;
+      pdf.addImage(canvas.toDataURL('image/jpeg', 1.0), 'JPEG', x, 0, w, h);
+      pdf.save(`${resume.full_name || 'My'}_Resume.pdf`);
+      showToast("\u2705 PDF downloaded!");
+    } catch (err) {
+      console.error('PDF error:', err);
+      showToast("\u274C PDF generation failed");
+    }
+    // Restore preview scaling
+    inner.style.transform = savedTransform;
+    inner.style.transformOrigin = savedOrigin;
+    inner.style.width = savedWidth;
   };
   const token = localStorage.getItem("token");
   const headers = { "Content-Type": "application/json", Authorization: `Bearer ${token}` };
@@ -2423,6 +2471,7 @@ export default function ResumeBuilder() {
   const [saving, setSaving] = useState(false);
   const [toast, setToast] = useState("");
   const [showExtra, setShowExtra] = useState(false);
+  const [editingItem, setEditingItem] = useState(null); // { type, index, data }
    
   const [resume, setResume] = useState({
     title: "", summary: "", full_name: "", professional_title: "",
@@ -2431,7 +2480,7 @@ export default function ResumeBuilder() {
   });
   
   const [templateStyle, setTemplateStyle] = useState("classic");
-  const [showTemplateSwitcher, setShowTemplateSwitcher] = useState(false);
+  const [showTemplateDropdown, setShowTemplateDropdown] = useState(false);
   const [experiences, setExperiences] = useState([]);
   const [expForm, setExpForm] = useState({ company: "", role: "", start_date: "", end_date: "", description: "" });
 
@@ -2516,31 +2565,6 @@ export default function ResumeBuilder() {
     finally { setSaving(false); }
   };
 
-  // ── TEMPLATE SWITCHER: change template & save to backend ──
-  const handleTemplateSwitch = async (newStyle) => {
-    // Find the category for the chosen style
-    const opt = TEMPLATE_OPTIONS.find(o => o.style === newStyle);
-    const newCategory = opt ? opt.category.toLowerCase() : resume.template_name;
-
-    // Update local state instantly (live preview updates immediately)
-    setTemplateStyle(newStyle);
-    setResume(prev => ({ ...prev, template_name: newCategory, template_style: newStyle }));
-    setShowTemplateSwitcher(false);
-
-    // Save to backend
-    try {
-      const res = await fetch(`/api/resume/${id}`, {
-        method: "PUT",
-        headers,
-        body: JSON.stringify({ ...resume, template_name: newCategory, template_style: newStyle })
-      });
-      if (res.ok) showToast("✅ Template changed!");
-      else showToast("❌ Failed to save template");
-    } catch {
-      showToast("❌ Failed to save template");
-    }
-  };
-
   const addItem = async (url, body, resetFn, type) => {
     try {
       const res = await fetch(url, { method: "POST", headers, body: JSON.stringify(body) });
@@ -2566,112 +2590,228 @@ export default function ResumeBuilder() {
     } catch { alert("Failed to delete"); }
   };
 
-  const inp = { width: "100%", border: "1px solid #e5e7eb", borderRadius: 10, padding: "10px 13px", fontSize: 13, outline: "none", background: "#f9fafb", boxSizing: "border-box" };
-  const lbl = { display: "block", fontSize: 12, fontWeight: 600, color: "#374151", marginBottom: 5 };
-  const fld = { marginBottom: 14 };
-  const btn = { background: "#2563eb", color: "#fff", border: "none", borderRadius: 8, padding: "9px 18px", fontSize: 13, fontWeight: 600, cursor: "pointer" };
-  const card = { background: "#f9fafb", border: "1px solid #e5e7eb", borderRadius: 10, padding: 14, marginBottom: 10, display: "flex", justifyContent: "space-between", alignItems: "flex-start" };
-  const delBtn = { background: "none", border: "none", color: "#ef4444", cursor: "pointer", fontSize: 12 };
+  const updateItem = async (url, data, type, index) => {
+    try {
+      const res = await fetch(url, { method: "PUT", headers, body: JSON.stringify(data) });
+      if (!res.ok) { const d = await res.json(); alert(d.error || "Failed to update"); return; }
+      if (type === "experience") setExperiences(prev => prev.map((item, i) => i === index ? { ...item, ...data } : item));
+      if (type === "education") setEducations(prev => prev.map((item, i) => i === index ? { ...item, ...data } : item));
+      if (type === "skills") setSkills(prev => prev.map((item, i) => i === index ? { ...item, ...data } : item));
+      if (type === "projects") setProjects(prev => prev.map((item, i) => i === index ? { ...item, ...data } : item));
+      if (type === "certs") setCerts(prev => prev.map((item, i) => i === index ? { ...item, ...data } : item));
+      setEditingItem(null);
+      showToast("✅ Updated successfully!");
+    } catch { alert("Failed to update"); }
+  };
+
+  const inp = { width: "100%", border: "1.5px solid #e2e8f0", borderRadius: 12, padding: "11px 14px", fontSize: 13.5, outline: "none", background: "#f8fafc", boxSizing: "border-box", transition: "all 0.2s ease", fontFamily: "inherit", color: "#1e293b" };
+  const lbl = { display: "block", fontSize: 12, fontWeight: 600, color: "#475569", marginBottom: 6, letterSpacing: "0.01em" };
+  const fld = { marginBottom: 20 };
+  const btn = { background: "linear-gradient(135deg, #6366f1, #8b5cf6)", color: "#fff", border: "none", borderRadius: 10, padding: "10px 20px", fontSize: 13.5, fontWeight: 600, cursor: "pointer", transition: "all 0.2s ease", boxShadow: "0 2px 8px rgba(99,102,241,0.25)" };
+  const card = { background: "#fff", border: "1.5px solid #e2e8f0", borderRadius: 12, padding: "16px 18px", marginBottom: 14, display: "flex", justifyContent: "space-between", alignItems: "flex-start", transition: "all 0.2s ease", boxShadow: "0 1px 3px rgba(0,0,0,0.04)" };
+  const delBtn = { background: "none", border: "none", color: "#ef4444", cursor: "pointer", fontSize: 12, fontWeight: 600, padding: "4px 8px", borderRadius: 6, transition: "all 0.15s ease" };
+  const editBtn = { background: "none", border: "none", color: "#6366f1", cursor: "pointer", fontSize: 12, fontWeight: 600, padding: "4px 8px", borderRadius: 6, transition: "all 0.15s ease" };
+  const aiBtn = { background: "linear-gradient(135deg, #6366f1, #8b5cf6)", color: "#fff", border: "none", borderRadius: 20, padding: "5px 14px", fontSize: 12, fontWeight: 600, cursor: "pointer", boxShadow: "0 2px 8px rgba(99,102,241,0.2)" };
 
   return (
-    <div style={{ minHeight: "100vh", backgroundColor: "#f3f4f6", fontFamily: "sans-serif" }}>
-      <header style={{ backgroundColor: "#fff", borderBottom: "1px solid #e5e7eb", padding: "0 20px", height: 52, display: "flex", alignItems: "center", justifyContent: "space-between", position: "sticky", top: 0, zIndex: 50 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <button onClick={() => navigate("/dashboard")} style={{ background: "none", border: "none", cursor: "pointer", color: "#6b7280", fontSize: 13 }}>← Dashboard</button>
+    <div style={{ minHeight: "100vh", backgroundColor: "#f1f5f9", fontFamily: "'Inter', sans-serif" }}>
+      <style>{`
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+        .rb-tab { flex: 1; padding: 8px 2px; border-radius: 8px; border: none; font-size: 11.5px; font-weight: 600; cursor: pointer; transition: all 0.25s ease; font-family: inherit; }
+        .rb-tab:hover { background: rgba(99,102,241,0.06); }
+        .rb-card:hover { border-color: #c7d2fe; box-shadow: 0 4px 12px rgba(99,102,241,0.08); }
+        .rb-inp:focus { border-color: #818cf8; box-shadow: 0 0 0 3px rgba(129,140,248,0.12); background: #fff; }
+        .rb-edit-modal { animation: slideIn 0.25s ease; }
+      `}</style>
+
+      <header style={{
+        background: "rgba(255,255,255,0.85)", backdropFilter: "blur(12px)",
+        borderBottom: "1px solid rgba(226,232,240,0.7)", padding: "0 20px", height: 56,
+        display: "flex", alignItems: "center", justifyContent: "space-between",
+        position: "sticky", top: 0, zIndex: 50
+      }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+          <button onClick={() => navigate("/dashboard")} style={{
+            background: "none", border: "1.5px solid #e2e8f0", borderRadius: 8, padding: "6px 12px",
+            cursor: "pointer", color: "#64748b", fontSize: 13, fontWeight: 600, display: "flex", alignItems: "center", gap: 6, transition: "all 0.2s ease", fontFamily: "inherit"
+          }}>
+            <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path strokeLinecap="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+            Dashboard
+          </button>
+          <div style={{ width: 1, height: 24, background: "#e2e8f0" }} />
           <input value={resume.title} onChange={e => setResume({ ...resume, title: e.target.value })} placeholder="Resume Title"
-            style={{ border: "none", outline: "none", fontSize: 14, fontWeight: 700, color: "#111827", background: "transparent", width: 200 }} />
+            style={{ border: "none", outline: "none", fontSize: 15, fontWeight: 700, color: "#0f172a", background: "transparent", width: 220, fontFamily: "inherit" }} />
         </div>
         <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-  {/* ── TEMPLATE SWITCHER BUTTON ── */}
-  <div style={{ position: "relative" }}>
-    <button
-      onClick={() => setShowTemplateSwitcher(!showTemplateSwitcher)}
-      style={{ background: "#7c3aed", color: "#fff", border: "none", borderRadius: 8, padding: "7px 18px", fontSize: 13, fontWeight: 600, cursor: "pointer" }}>
-      🎨 Change Template
-    </button>
-    {showTemplateSwitcher && (
-      <div style={{
-        position: "absolute", top: 42, right: 0, background: "#fff", border: "1px solid #e5e7eb",
-        borderRadius: 12, boxShadow: "0 8px 30px rgba(0,0,0,0.18)", width: 280, maxHeight: 400,
-        overflowY: "auto", zIndex: 999, padding: "8px 0"
-      }}>
-        {["Simple", "Modern", "Creative"].map(cat => (
-          <div key={cat}>
-            <div style={{ padding: "8px 16px 4px", fontSize: 11, fontWeight: 700, color: "#9ca3af", textTransform: "uppercase", letterSpacing: "0.05em" }}>{cat}</div>
-            {TEMPLATE_OPTIONS.filter(o => o.category === cat).map(opt => (
-              <button key={opt.style} onClick={() => handleTemplateSwitch(opt.style)}
-                style={{
-                  display: "block", width: "100%", textAlign: "left", padding: "8px 16px", border: "none",
-                  background: templateStyle === opt.style ? "#ede9fe" : "transparent",
-                  color: templateStyle === opt.style ? "#7c3aed" : "#374151",
-                  fontWeight: templateStyle === opt.style ? 700 : 400,
-                  fontSize: 13, cursor: "pointer"
+          {/* Template Selector */}
+          <div style={{ position: "relative" }}>
+            <button onClick={() => setShowTemplateDropdown(!showTemplateDropdown)} style={{
+              background: "linear-gradient(135deg, #eef2ff, #f5f3ff)", border: "1.5px solid #c7d2fe", borderRadius: 10, padding: "7px 14px",
+              cursor: "pointer", color: "#4f46e5", fontSize: 13, fontWeight: 600, display: "flex", alignItems: "center", gap: 6, transition: "all 0.2s ease", fontFamily: "inherit"
+            }}>
+              <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"/></svg>
+              {TEMPLATE_OPTIONS.flatMap(g => g.items).find(t => t.style === templateStyle)?.name || "Template"}
+              <svg width="10" height="10" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3"><path strokeLinecap="round" d="M19 9l-7 7-7-7"/></svg>
+            </button>
+            {showTemplateDropdown && (
+              <>
+                <div onClick={() => setShowTemplateDropdown(false)} style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, zIndex: 98 }} />
+                <div style={{
+                  position: "absolute", top: "calc(100% + 6px)", right: 0, zIndex: 99,
+                  background: "#fff", border: "1.5px solid #e2e8f0", borderRadius: 14,
+                  boxShadow: "0 12px 40px rgba(0,0,0,0.15)", padding: "8px 0",
+                  width: 220, maxHeight: 400, overflowY: "auto",
+                  animation: "slideIn 0.2s ease"
                 }}>
-                {opt.label} {templateStyle === opt.style && "✓"}
-              </button>
-            ))}
+                  {TEMPLATE_OPTIONS.map(group => (
+                    <div key={group.group}>
+                      <p style={{ fontSize: 10, fontWeight: 700, color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.05em", padding: "8px 16px 4px", margin: 0 }}>{group.group}</p>
+                      {group.items.map(t => (
+                        <button key={t.style} onClick={() => { setTemplateStyle(t.style); setShowTemplateDropdown(false); }}
+                          style={{
+                            display: "flex", alignItems: "center", gap: 8, width: "100%", padding: "8px 16px",
+                            border: "none", background: templateStyle === t.style ? "linear-gradient(135deg, #eef2ff, #f5f3ff)" : "transparent",
+                            cursor: "pointer", fontSize: 13, fontWeight: templateStyle === t.style ? 700 : 500,
+                            color: templateStyle === t.style ? "#4f46e5" : "#334155", transition: "all 0.15s ease", fontFamily: "inherit", textAlign: "left"
+                          }}>
+                          {templateStyle === t.style && <span style={{ fontSize: 11, color: "#6366f1" }}>✓</span>}
+                          {t.name}
+                        </button>
+                      ))}
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
           </div>
-        ))}
-      </div>
-    )}
-  </div>
-  <button
-    onClick={() => {
-      showToast("📄 Preparing PDF...");
-      handlePrint();
-    }}
-    style={{ background: "#16a34a", color: "#fff", border: "none", borderRadius: 8, padding: "7px 18px", fontSize: 13, fontWeight: 600, cursor: "pointer" }}>
-    📄 Download PDF
-  </button>
-  <button onClick={saveResume} disabled={saving} style={{ ...btn, padding: "7px 18px" }}>
-    {saving ? "Saving..." : "💾 Save"}
-  </button>
-</div>
+          <button onClick={async () => { showToast("📄 Preparing PDF..."); await handlePrint(); }}
+            style={{ background: "#059669", color: "#fff", border: "none", borderRadius: 10, padding: "8px 18px", fontSize: 13, fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", gap: 6, boxShadow: "0 2px 8px rgba(5,150,105,0.25)", transition: "all 0.2s ease", fontFamily: "inherit" }}>
+            <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+            Download PDF
+          </button>
+          <button onClick={saveResume} disabled={saving} style={{ ...btn, padding: "8px 18px", display: "flex", alignItems: "center", gap: 6, fontFamily: "inherit" }}>
+            <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" d="M5 13l4 4L19 7"/></svg>
+            {saving ? "Saving..." : "Save"}
+          </button>
+        </div>
       </header>
 
       {toast && (
-        <div style={{ position: "fixed", top: 70, right: 24, zIndex: 999, background: toast.startsWith("✅") ? "#16a34a" : "#dc2626", color: "#fff", padding: "12px 24px", borderRadius: 10, fontSize: 14, fontWeight: 600, boxShadow: "0 4px 16px rgba(0,0,0,0.15)", animation: "fadeIn 0.3s ease" }}>
+        <div style={{
+          position: "fixed", top: 16, right: 24, zIndex: 999,
+          background: toast.startsWith("✅") ? "linear-gradient(135deg, #059669, #10b981)" : toast.startsWith("✨") || toast.startsWith("📄") ? "linear-gradient(135deg, #6366f1, #8b5cf6)" : "linear-gradient(135deg, #dc2626, #ef4444)",
+          color: "#fff", padding: "12px 24px", borderRadius: 12, fontSize: 14, fontWeight: 600,
+          boxShadow: "0 8px 24px rgba(0,0,0,0.15)", animation: "fadeIn 0.3s ease",
+          display: "flex", alignItems: "center", gap: 8, backdropFilter: "blur(8px)"
+        }}>
           {toast}
-          <style>{`@keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }`}</style>
         </div>
       )}
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", height: "calc(100vh - 52px)" }}>
+      {/* Edit Modal Overlay */}
+      {editingItem && (
+        <div style={{ position: "fixed", inset: 0, background: "rgba(15,23,42,0.4)", backdropFilter: "blur(4px)", zIndex: 100, display: "flex", alignItems: "center", justifyContent: "center" }}
+          onClick={() => setEditingItem(null)}>
+          <div className="rb-edit-modal" onClick={e => e.stopPropagation()} style={{
+            background: "#fff", borderRadius: 16, padding: 28, width: "100%", maxWidth: 520,
+            boxShadow: "0 24px 64px rgba(0,0,0,0.15)", border: "1px solid #e2e8f0"
+          }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+              <h3 style={{ fontWeight: 800, fontSize: 18, color: "#0f172a", margin: 0 }}>
+                Edit {editingItem.type === "certs" ? "Certification" : editingItem.type.charAt(0).toUpperCase() + editingItem.type.slice(1)}
+              </h3>
+              <button onClick={() => setEditingItem(null)} style={{ background: "#f1f5f9", border: "none", borderRadius: 8, width: 32, height: 32, cursor: "pointer", fontSize: 16, color: "#64748b", display: "flex", alignItems: "center", justifyContent: "center" }}>✕</button>
+            </div>
+
+            {editingItem.type === "experience" && (
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+                {[["Company", "company"], ["Role", "role"], ["Start Date", "start_date"], ["End Date", "end_date"]].map(([l, k]) => (
+                  <div key={k}><label style={lbl}>{l}</label><input className="rb-inp" style={inp} value={editingItem.data[k] || ""} onChange={e => setEditingItem({ ...editingItem, data: { ...editingItem.data, [k]: e.target.value } })} /></div>
+                ))}
+                <div style={{ gridColumn: "1/-1" }}><label style={lbl}>Description</label><textarea className="rb-inp" style={{ ...inp, resize: "none" }} rows={3} value={editingItem.data.description || ""} onChange={e => setEditingItem({ ...editingItem, data: { ...editingItem.data, description: e.target.value } })} /></div>
+              </div>
+            )}
+            {editingItem.type === "education" && (
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+                {[["Degree", "degree"], ["Institution", "institution"], ["Start Year", "start_year"], ["End Year", "end_year"], ["Grade / Score", "score"]].map(([l, k]) => (
+                  <div key={k}><label style={lbl}>{l}</label><input className="rb-inp" style={inp} value={editingItem.data[k] || ""} onChange={e => setEditingItem({ ...editingItem, data: { ...editingItem.data, [k]: e.target.value } })} /></div>
+                ))}
+              </div>
+            )}
+            {editingItem.type === "skills" && (
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+                <div><label style={lbl}>Skill Name</label><input className="rb-inp" style={inp} value={editingItem.data.name || ""} onChange={e => setEditingItem({ ...editingItem, data: { ...editingItem.data, name: e.target.value } })} /></div>
+                <div><label style={lbl}>Level</label>
+                  <select className="rb-inp" style={inp} value={editingItem.data.level || "Intermediate"} onChange={e => setEditingItem({ ...editingItem, data: { ...editingItem.data, level: e.target.value } })}>
+                    {["Beginner", "Intermediate", "Advanced", "Expert"].map(l => <option key={l}>{l}</option>)}
+                  </select>
+                </div>
+              </div>
+            )}
+            {editingItem.type === "projects" && (
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+                {[["Title", "title"], ["Tech Stack", "tech_stack"], ["Link", "link"]].map(([l, k]) => (
+                  <div key={k}><label style={lbl}>{l}</label><input className="rb-inp" style={inp} value={editingItem.data[k] || ""} onChange={e => setEditingItem({ ...editingItem, data: { ...editingItem.data, [k]: e.target.value } })} /></div>
+                ))}
+                <div style={{ gridColumn: "1/-1" }}><label style={lbl}>Description</label><textarea className="rb-inp" style={{ ...inp, resize: "none" }} rows={3} value={editingItem.data.description || ""} onChange={e => setEditingItem({ ...editingItem, data: { ...editingItem.data, description: e.target.value } })} /></div>
+              </div>
+            )}
+            {editingItem.type === "certs" && (
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+                {[["Name", "name"], ["Issuer", "issuer"], ["Issue Date", "issue_date"], ["Expiry Date", "expiry_date"]].map(([l, k]) => (
+                  <div key={k}><label style={lbl}>{l}</label><input className="rb-inp" style={inp} value={editingItem.data[k] || ""} onChange={e => setEditingItem({ ...editingItem, data: { ...editingItem.data, [k]: e.target.value } })} /></div>
+                ))}
+              </div>
+            )}
+
+            <div style={{ display: "flex", gap: 10, marginTop: 20, justifyContent: "flex-end" }}>
+              <button onClick={() => setEditingItem(null)} style={{ background: "#f1f5f9", border: "1.5px solid #e2e8f0", borderRadius: 10, padding: "9px 20px", fontSize: 13, fontWeight: 600, cursor: "pointer", color: "#64748b", fontFamily: "inherit" }}>Cancel</button>
+              <button onClick={() => {
+                const urlMap = { experience: `/api/experience/${editingItem.data.id}`, education: `/api/education/${editingItem.data.id}`, skills: `/api/skills/${editingItem.data.id}`, projects: `/api/projects/${editingItem.data.id}`, certs: `/api/certifications/${editingItem.data.id}` };
+                updateItem(urlMap[editingItem.type], editingItem.data, editingItem.type, editingItem.index);
+              }} style={{ ...btn, fontFamily: "inherit" }}>Save Changes</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div style={{ display: "grid", gridTemplateColumns: "480px 1fr", height: "calc(100vh - 56px)" }}>
         {/* LEFT */}
-        <div style={{ overflowY: "auto", padding: "20px 16px", borderRight: "1px solid #e5e7eb" }}>
-          <div style={{ display: "flex", gap: 3, backgroundColor: "#e5e7eb", borderRadius: 10, padding: 3, marginBottom: 18 }}>
+        <div style={{ overflowY: "auto", padding: "24px 22px", borderRight: "1px solid #e2e8f0", background: "#fff" }}>
+          <div style={{ display: "flex", gap: 3, backgroundColor: "#f1f5f9", borderRadius: 10, padding: 3, marginBottom: 24 }}>
             {TABS.map((tab, i) => (
-              <button key={tab} onClick={() => setActiveTab(i)}
-                style={{ flex: 1, padding: "7px 2px", borderRadius: 7, border: "none", fontSize: 11, fontWeight: 600, cursor: "pointer", backgroundColor: activeTab === i ? "#fff" : "transparent", color: activeTab === i ? "#2563eb" : "#6b7280", boxShadow: activeTab === i ? "0 1px 3px rgba(0,0,0,0.08)" : "none" }}>
+              <button key={tab} onClick={() => setActiveTab(i)} className="rb-tab"
+                style={{ backgroundColor: activeTab === i ? "#fff" : "transparent", color: activeTab === i ? "#6366f1" : "#64748b", boxShadow: activeTab === i ? "0 1px 4px rgba(0,0,0,0.08)" : "none" }}>
                 {tab}
               </button>
             ))}
           </div>
 
-          <div style={{ backgroundColor: "#fff", borderRadius: 12, border: "1px solid #e5e7eb", padding: 20 }}>
+          <div style={{ backgroundColor: "#fff", borderRadius: 14, border: "1.5px solid #e2e8f0", padding: 26, boxShadow: "0 1px 3px rgba(0,0,0,0.03)" }}>
 
             {/* PERSONAL */}
             {activeTab === 0 && (
               <div>
-                <h2 style={{ fontWeight: 800, fontSize: 17, marginBottom: 4 }}>Edit Personal Details</h2>
-                <p style={{ fontSize: 12, color: "#9ca3af", marginBottom: 18 }}>Appears at the top of your resume.</p>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+                <h2 style={{ fontWeight: 800, fontSize: 18, marginBottom: 4, color: "#0f172a" }}>Personal Details</h2>
+                <p style={{ fontSize: 12, color: "#94a3b8", marginBottom: 20 }}>This information appears at the top of your resume.</p>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 18 }}>
                   {[["Full Name", "full_name", "e.g. Anna Field"], ["Professional Title", "professional_title", "Target position or current role"], ["Email", "email", "Enter email"], ["Phone", "phone", "Enter Phone"]].map(([label, key, ph]) => (
-                    <div key={key} style={fld}><label style={lbl}>{label}</label><input style={inp} placeholder={ph} value={resume[key]} onChange={e => setResume({ ...resume, [key]: e.target.value })} /></div>
+                    <div key={key} style={fld}><label style={lbl}>{label}</label><input className="rb-inp" style={inp} placeholder={ph} value={resume[key]} onChange={e => setResume({ ...resume, [key]: e.target.value })} /></div>
                   ))}
-                  <div style={{ ...fld, gridColumn: "1/-1" }}><label style={lbl}>Location</label><input style={inp} placeholder="City, Country" value={resume.location} onChange={e => setResume({ ...resume, location: e.target.value })} /></div>
+                  <div style={{ ...fld, gridColumn: "1/-1" }}><label style={lbl}>Location</label><input className="rb-inp" style={inp} placeholder="City, Country" value={resume.location} onChange={e => setResume({ ...resume, location: e.target.value })} /></div>
                 </div>
-                <div style={{ borderTop: "1px solid #f3f4f6", paddingTop: 14, marginBottom: 14 }}>
-                  <p style={{ fontSize: 13, fontWeight: 700, marginBottom: 10 }}>Add details</p>
+                <div style={{ borderTop: "1.5px solid #f1f5f9", paddingTop: 20, marginBottom: 20, marginTop: 8 }}>
+                  <p style={{ fontSize: 13, fontWeight: 700, marginBottom: 10, color: "#334155" }}>Additional Details</p>
                   <div style={{ display: "flex", flexWrap: "wrap", gap: 7 }}>
                     {["LinkedIn", "Website", "Nationality", "Date of Birth"].map(label => (
-                      <button key={label} onClick={() => setShowExtra(true)} style={{ display: "flex", alignItems: "center", gap: 4, padding: "5px 12px", border: "1px solid #e5e7eb", borderRadius: 20, background: "#fff", fontSize: 12, cursor: "pointer", color: "#374151" }}>+ {label}</button>
+                      <button key={label} onClick={() => setShowExtra(true)} style={{ display: "flex", alignItems: "center", gap: 4, padding: "6px 14px", border: "1.5px solid #e2e8f0", borderRadius: 20, background: "#f8fafc", fontSize: 12, cursor: "pointer", color: "#475569", fontWeight: 500, transition: "all 0.2s", fontFamily: "inherit" }}>+ {label}</button>
                     ))}
                   </div>
                   {showExtra && (
-                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginTop: 14 }}>
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 18, marginTop: 16 }}>
                       {[["LinkedIn", "linkedin", "linkedin.com/in/yourname"], ["Website", "website", "yourwebsite.com"], ["Nationality", "nationality", "e.g. Indian"], ["Date of Birth", "date_of_birth", "DD/MM/YYYY"]].map(([label, key, ph]) => (
-                        <div key={key} style={fld}><label style={lbl}>{label}</label><input style={inp} placeholder={ph} value={resume[key]} onChange={e => setResume({ ...resume, [key]: e.target.value })} /></div>
+                        <div key={key} style={fld}><label style={lbl}>{label}</label><input className="rb-inp" style={inp} placeholder={ph} value={resume[key]} onChange={e => setResume({ ...resume, [key]: e.target.value })} /></div>
                       ))}
                     </div>
                   )}
@@ -2700,29 +2840,36 @@ export default function ResumeBuilder() {
           showToast("❌ Failed to generate");
         }
                  }}
-                 style={{ background: "linear-gradient(135deg, #6366f1, #8b5cf6)", color: "#fff", border: "none", borderRadius: 20, padding: "5px 14px", fontSize: 12, fontWeight: 600, cursor: "pointer" }}>
+                 style={aiBtn}>
                 ✨ Generate with AI
                 </button>
                 </div>
-                <textarea style={{ ...inp, resize: "none" }} rows={4} placeholder="Write a brief professional summary or click ✨ Generate with AI..." value={resume.summary} onChange={e => setResume({ ...resume, summary: e.target.value })} />
+                <textarea className="rb-inp" style={{ ...inp, resize: "none" }} rows={4} placeholder="Write a brief professional summary or click ✨ Generate with AI..." value={resume.summary} onChange={e => setResume({ ...resume, summary: e.target.value })} />
                 </div>
-                <button onClick={saveResume} disabled={saving} style={{ ...btn, width: "100%", padding: "12px", fontSize: 14, borderRadius: 10, background: "linear-gradient(135deg, #ec4899, #f97316)" }}>{saving ? "Saving..." : "✓  Done"}</button>
+                <button onClick={saveResume} disabled={saving} style={{ ...btn, width: "100%", padding: "12px", fontSize: 14, borderRadius: 12, background: "linear-gradient(135deg, #6366f1, #8b5cf6)", marginTop: 8, fontFamily: "inherit" }}>{saving ? "Saving..." : "✓ Save Personal Info"}</button>
               </div>
             )}
 
             {/* EXPERIENCE */}
             {activeTab === 1 && (
               <div>
-                <h2 style={{ fontWeight: 800, fontSize: 17, marginBottom: 14 }}>Work Experience</h2>
+                <h2 style={{ fontWeight: 800, fontSize: 18, marginBottom: 18, color: "#0f172a" }}>Work Experience</h2>
                 {experiences.map((exp, i) => (
-                  <div key={i} style={card}>
-                    <div><p style={{ fontWeight: 700, fontSize: 13, margin: 0 }}>{exp.role} at {exp.company}</p><p style={{ fontSize: 11, color: "#6b7280", margin: "2px 0" }}>{exp.start_date} – {exp.end_date || "Present"}</p></div>
-                    <button style={delBtn} onClick={() => deleteItem(`/api/experience/${exp.id}`, "experience", i)}>Delete</button>
+                  <div key={i} style={card} className="rb-card">
+                    <div style={{ flex: 1 }}>
+                      <p style={{ fontWeight: 700, fontSize: 13.5, margin: 0, color: "#0f172a" }}>{exp.role} <span style={{ color: "#94a3b8", fontWeight: 400 }}>at</span> {exp.company}</p>
+                      <p style={{ fontSize: 11.5, color: "#64748b", margin: "3px 0 0" }}>{exp.start_date} – {exp.end_date || "Present"}</p>
+                    </div>
+                    <div style={{ display: "flex", gap: 4 }}>
+                      <button style={editBtn} onClick={() => setEditingItem({ type: "experience", index: i, data: { ...exp } })}>✏️ Edit</button>
+                      <button style={delBtn} onClick={() => deleteItem(`/api/experience/${exp.id}`, "experience", i)}>🗑️</button>
+                    </div>
                   </div>
                 ))}
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 10 }}>
+                {experiences.length > 0 && <div style={{ borderTop: "1.5px dashed #e2e8f0", margin: "18px 0 16px", position: "relative" }}><span style={{ position: "absolute", top: -10, left: 16, background: "#fff", padding: "0 8px", fontSize: 11, fontWeight: 600, color: "#94a3b8" }}>Add New</span></div>}
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 16 }}>
                   {[["Company", "company", "e.g. Google"], ["Role", "role", "e.g. Software Engineer"], ["Start Date", "start_date", "Jan 2022"], ["End Date", "end_date", "Present"]].map(([label, key, ph]) => (
-                    <div key={key}><label style={lbl}>{label}</label><input style={inp} placeholder={ph} value={expForm[key]} onChange={e => setExpForm({ ...expForm, [key]: e.target.value })} /></div>
+                    <div key={key}><label style={lbl}>{label}</label><input className="rb-inp" style={inp} placeholder={ph} value={expForm[key]} onChange={e => setExpForm({ ...expForm, [key]: e.target.value })} /></div>
                   ))}
                 </div>
                 <div style={fld}>
@@ -2757,58 +2904,67 @@ export default function ResumeBuilder() {
           showToast("❌ Failed to generate");
         }
       }}
-      style={{ background: "linear-gradient(135deg, #6366f1, #8b5cf6)", color: "#fff", border: "none", borderRadius: 20, padding: "5px 14px", fontSize: 12, fontWeight: 600, cursor: "pointer" }}>
+      style={aiBtn}>
       ✨ Generate with AI
     </button>
   </div>
-  <textarea style={{ ...inp, resize: "none" }} rows={3}
+  <textarea className="rb-inp" style={{ ...inp, resize: "none" }} rows={3}
     placeholder="Describe responsibilities or click ✨ Generate with AI..."
     value={expForm.description}
     onChange={e => setExpForm({ ...expForm, description: e.target.value })} />
 </div>
-                <button style={btn} onClick={() => addItem(`/api/experience/`, { ...expForm, resume_id: parseInt(id) }, () => setExpForm({ company: "", role: "", start_date: "", end_date: "", description: "" }), "experience")}>+ Add Experience</button>
+                <button style={{ ...btn, fontFamily: "inherit", marginTop: 8 }} onClick={() => addItem(`/api/experience/`, { ...expForm, resume_id: parseInt(id) }, () => setExpForm({ company: "", role: "", start_date: "", end_date: "", description: "" }), "experience")}>+ Add Experience</button>
               </div>
             )}
 
             {/* EDUCATION */}
             {activeTab === 2 && (
               <div>
-                <h2 style={{ fontWeight: 800, fontSize: 17, marginBottom: 14 }}>Education</h2>
+                <h2 style={{ fontWeight: 800, fontSize: 18, marginBottom: 18, color: "#0f172a" }}>Education</h2>
                 {educations.map((edu, i) => (
-                  <div key={i} style={card}>
-                    <div><p style={{ fontWeight: 700, fontSize: 13, margin: 0 }}>{edu.degree} — {edu.institution}</p><p style={{ fontSize: 11, color: "#6b7280", margin: 0 }}>{edu.start_year} – {edu.end_year}</p></div>
-                    <button style={delBtn} onClick={() => deleteItem(`/api/education/${edu.id}`, "education", i)}>Delete</button>
+                  <div key={i} style={card} className="rb-card">
+                    <div style={{ flex: 1 }}>
+                      <p style={{ fontWeight: 700, fontSize: 13.5, margin: 0, color: "#0f172a" }}>{edu.degree} — {edu.institution}</p>
+                      <p style={{ fontSize: 11.5, color: "#64748b", margin: "3px 0 0" }}>{edu.start_year} – {edu.end_year}{edu.score ? ` · ${edu.score}` : ""}</p>
+                    </div>
+                    <div style={{ display: "flex", gap: 4 }}>
+                      <button style={editBtn} onClick={() => setEditingItem({ type: "education", index: i, data: { ...edu } })}>✏️ Edit</button>
+                      <button style={delBtn} onClick={() => deleteItem(`/api/education/${edu.id}`, "education", i)}>🗑️</button>
+                    </div>
                   </div>
                 ))}
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 10 }}>
+                {educations.length > 0 && <div style={{ borderTop: "1.5px dashed #e2e8f0", margin: "18px 0 16px", position: "relative" }}><span style={{ position: "absolute", top: -10, left: 16, background: "#fff", padding: "0 8px", fontSize: 11, fontWeight: 600, color: "#94a3b8" }}>Add New</span></div>}
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 16 }}>
                   {[["Degree", "degree", "e.g. B.Tech"], ["Institution", "institution", "e.g. IIT Bombay"], ["Start Year", "start_year", "2018"], ["End Year", "end_year", "2022"], ["Grade / Score", "score", "e.g. 79% or 9.08 CGPA"]].map(([label, key, ph]) => (
-                    <div key={key}><label style={lbl}>{label}</label><input style={inp} placeholder={ph} value={eduForm[key]} onChange={e => setEduForm({ ...eduForm, [key]: e.target.value })} /></div>
+                    <div key={key}><label style={lbl}>{label}</label><input className="rb-inp" style={inp} placeholder={ph} value={eduForm[key]} onChange={e => setEduForm({ ...eduForm, [key]: e.target.value })} /></div>
                   ))}
                 </div>
-                <button style={btn} onClick={() => addItem(`/api/education/`, { ...eduForm, resume_id: parseInt(id) }, () => setEduForm({ degree: "", institution: "", start_year: "", end_year: "", gpa: "" }), "education")}>+ Add Education</button>
+                <button style={{ ...btn, fontFamily: "inherit", marginTop: 8 }} onClick={() => addItem(`/api/education/`, { ...eduForm, resume_id: parseInt(id) }, () => setEduForm({ degree: "", institution: "", start_year: "", end_year: "", gpa: "" }), "education")}>+ Add Education</button>
               </div>
             )}
 
             {/* SKILLS */}
             {activeTab === 3 && (
               <div>
-                <h2 style={{ fontWeight: 800, fontSize: 17, marginBottom: 14 }}>Skills</h2>
-                <div style={{ display: "flex", flexWrap: "wrap", gap: 7, marginBottom: 16 }}>
+                <h2 style={{ fontWeight: 800, fontSize: 18, marginBottom: 18, color: "#0f172a" }}>Skills</h2>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 10, marginBottom: 22 }}>
                   {skills.map((s, i) => (
-                    <span key={i} style={{ background: "#eff6ff", color: "#2563eb", border: "1px solid #bfdbfe", borderRadius: 20, padding: "4px 10px", fontSize: 12, display: "flex", alignItems: "center", gap: 5 }}>
-                      {s.name} · {s.level}
-                      <button onClick={() => deleteItem(`/api/skills/${s.id}`, "skills", i)} style={{ ...delBtn, fontSize: 11, padding: 0 }}>✕</button>
+                    <span key={i} style={{ background: "linear-gradient(135deg, #eef2ff, #f5f3ff)", color: "#4f46e5", border: "1.5px solid #c7d2fe", borderRadius: 20, padding: "5px 12px", fontSize: 12.5, display: "flex", alignItems: "center", gap: 6, fontWeight: 500 }}>
+                      {s.name} <span style={{ fontSize: 10, color: "#818cf8", fontWeight: 600 }}>· {s.level}</span>
+                      <button onClick={() => setEditingItem({ type: "skills", index: i, data: { ...s } })} style={{ ...editBtn, fontSize: 10, padding: 0 }}>✏️</button>
+                      <button onClick={() => deleteItem(`/api/skills/${s.id}`, "skills", i)} style={{ ...delBtn, fontSize: 10, padding: 0 }}>✕</button>
                     </span>
                   ))}
                 </div>
+                {skills.length > 0 && <div style={{ borderTop: "1.5px dashed #e2e8f0", margin: "4px 0 16px", position: "relative" }}><span style={{ position: "absolute", top: -10, left: 16, background: "#fff", padding: "0 8px", fontSize: 11, fontWeight: 600, color: "#94a3b8" }}>Add New</span></div>}
                 <div style={{ display: "flex", gap: 8, alignItems: "flex-end" }}>
-                  <div style={{ flex: 1 }}><label style={lbl}>Skill</label><input style={inp} placeholder="e.g. React" value={skillForm.name} onChange={e => setSkillForm({ ...skillForm, name: e.target.value })} /></div>
-                  <div style={{ width: 130 }}><label style={lbl}>Level</label>
-                    <select style={inp} value={skillForm.level} onChange={e => setSkillForm({ ...skillForm, level: e.target.value })}>
+                  <div style={{ flex: 1 }}><label style={lbl}>Skill</label><input className="rb-inp" style={inp} placeholder="e.g. React" value={skillForm.name} onChange={e => setSkillForm({ ...skillForm, name: e.target.value })} /></div>
+                  <div style={{ width: 140 }}><label style={lbl}>Level</label>
+                    <select className="rb-inp" style={inp} value={skillForm.level} onChange={e => setSkillForm({ ...skillForm, level: e.target.value })}>
                       {["Beginner", "Intermediate", "Advanced", "Expert"].map(l => <option key={l}>{l}</option>)}
                     </select>
                   </div>
-                  <button style={btn} onClick={() => addItem(`/api/skills/`, { ...skillForm, resume_id: parseInt(id) }, () => setSkillForm({ name: "", level: "Intermediate" }), "skills")}>+ Add</button>
+                  <button style={{ ...btn, fontFamily: "inherit" }} onClick={() => addItem(`/api/skills/`, { ...skillForm, resume_id: parseInt(id) }, () => setSkillForm({ name: "", level: "Intermediate" }), "skills")}>+ Add</button>
                 </div>
               </div>
             )}
@@ -2816,16 +2972,23 @@ export default function ResumeBuilder() {
             {/* PROJECTS */}
             {activeTab === 4 && (
               <div>
-                <h2 style={{ fontWeight: 800, fontSize: 17, marginBottom: 14 }}>Projects</h2>
+                <h2 style={{ fontWeight: 800, fontSize: 18, marginBottom: 18, color: "#0f172a" }}>Projects</h2>
                 {projects.map((p, i) => (
-                  <div key={i} style={card}>
-                    <div><p style={{ fontWeight: 700, fontSize: 13, margin: 0 }}>{p.title}</p><p style={{ fontSize: 11, color: "#6b7280", margin: 0 }}>{p.tech_stack}</p></div>
-                    <button style={delBtn} onClick={() => deleteItem(`/api/projects/${p.id}`, "projects", i)}>Delete</button>
+                  <div key={i} style={card} className="rb-card">
+                    <div style={{ flex: 1 }}>
+                      <p style={{ fontWeight: 700, fontSize: 13.5, margin: 0, color: "#0f172a" }}>{p.title}</p>
+                      <p style={{ fontSize: 11.5, color: "#64748b", margin: "3px 0 0" }}>{p.tech_stack}</p>
+                    </div>
+                    <div style={{ display: "flex", gap: 4 }}>
+                      <button style={editBtn} onClick={() => setEditingItem({ type: "projects", index: i, data: { ...p } })}>✏️ Edit</button>
+                      <button style={delBtn} onClick={() => deleteItem(`/api/projects/${p.id}`, "projects", i)}>🗑️</button>
+                    </div>
                   </div>
                 ))}
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 10 }}>
+                {projects.length > 0 && <div style={{ borderTop: "1.5px dashed #e2e8f0", margin: "18px 0 16px", position: "relative" }}><span style={{ position: "absolute", top: -10, left: 16, background: "#fff", padding: "0 8px", fontSize: 11, fontWeight: 600, color: "#94a3b8" }}>Add New</span></div>}
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 16 }}>
                   {[["Title", "title", "e.g. AI Resume Builder"], ["Tech Stack", "tech_stack", "React, Flask"], ["Link", "link", "https://github.com/..."]].map(([label, key, ph]) => (
-                    <div key={key}><label style={lbl}>{label}</label><input style={inp} placeholder={ph} value={projForm[key]} onChange={e => setProjForm({ ...projForm, [key]: e.target.value })} /></div>
+                    <div key={key}><label style={lbl}>{label}</label><input className="rb-inp" style={inp} placeholder={ph} value={projForm[key]} onChange={e => setProjForm({ ...projForm, [key]: e.target.value })} /></div>
                   ))}
                 </div>
                 <div style={fld}>
@@ -2858,50 +3021,58 @@ export default function ResumeBuilder() {
           showToast("❌ Failed to generate");
         }
       }}
-      style={{ background: "linear-gradient(135deg, #6366f1, #8b5cf6)", color: "#fff", border: "none", borderRadius: 20, padding: "5px 14px", fontSize: 12, fontWeight: 600, cursor: "pointer" }}>
+      style={aiBtn}>
       ✨ Generate with AI
     </button>
   </div>
-  <textarea style={{ ...inp, resize: "none" }} rows={3}
+  <textarea className="rb-inp" style={{ ...inp, resize: "none" }} rows={3}
     placeholder="Describe the project or click ✨ Generate with AI..."
     value={projForm.description}
     onChange={e => setProjForm({ ...projForm, description: e.target.value })} />
 </div>
-                <button style={btn} onClick={() => addItem(`/api/projects/`, { ...projForm, resume_id: parseInt(id) }, () => setProjForm({ title: "", description: "", tech_stack: "", link: "" }), "projects")}>+ Add Project</button>
+                <button style={{ ...btn, fontFamily: "inherit", marginTop: 8 }} onClick={() => addItem(`/api/projects/`, { ...projForm, resume_id: parseInt(id) }, () => setProjForm({ title: "", description: "", tech_stack: "", link: "" }), "projects")}>+ Add Project</button>
               </div>
             )}
 
             {/* CERTIFICATIONS */}
             {activeTab === 5 && (
               <div>
-                <h2 style={{ fontWeight: 800, fontSize: 17, marginBottom: 14 }}>Certifications</h2>
+                <h2 style={{ fontWeight: 800, fontSize: 18, marginBottom: 18, color: "#0f172a" }}>Certifications</h2>
                 {certs.map((c, i) => (
-                  <div key={i} style={card}>
-                    <div><p style={{ fontWeight: 700, fontSize: 13, margin: 0 }}>{c.name}</p><p style={{ fontSize: 11, color: "#6b7280", margin: 0 }}>{c.issuer} · {c.issue_date}</p></div>
-                    <button style={delBtn} onClick={() => deleteItem(`/api/certifications/${c.id}`, "certs", i)}>Delete</button>
+                  <div key={i} style={card} className="rb-card">
+                    <div style={{ flex: 1 }}>
+                      <p style={{ fontWeight: 700, fontSize: 13.5, margin: 0, color: "#0f172a" }}>{c.name}</p>
+                      <p style={{ fontSize: 11.5, color: "#64748b", margin: "3px 0 0" }}>{c.issuer}{c.issue_date ? ` · ${c.issue_date}` : ""}</p>
+                    </div>
+                    <div style={{ display: "flex", gap: 4 }}>
+                      <button style={editBtn} onClick={() => setEditingItem({ type: "certs", index: i, data: { ...c } })}>✏️ Edit</button>
+                      <button style={delBtn} onClick={() => deleteItem(`/api/certifications/${c.id}`, "certs", i)}>🗑️</button>
+                    </div>
                   </div>
                 ))}
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 10 }}>
+                {certs.length > 0 && <div style={{ borderTop: "1.5px dashed #e2e8f0", margin: "18px 0 16px", position: "relative" }}><span style={{ position: "absolute", top: -10, left: 16, background: "#fff", padding: "0 8px", fontSize: 11, fontWeight: 600, color: "#94a3b8" }}>Add New</span></div>}
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 16 }}>
                   {[["Name", "name", "AWS Solutions Architect"], ["Issuer", "issuer", "Amazon"], ["Issue Date", "issue_date", "Jan 2023"], ["Expiry Date", "expiry_date", "Jan 2026"]].map(([label, key, ph]) => (
-                    <div key={key}><label style={lbl}>{label}</label><input style={inp} placeholder={ph} value={certForm[key]} onChange={e => setCertForm({ ...certForm, [key]: e.target.value })} /></div>
+                    <div key={key}><label style={lbl}>{label}</label><input className="rb-inp" style={inp} placeholder={ph} value={certForm[key]} onChange={e => setCertForm({ ...certForm, [key]: e.target.value })} /></div>
                   ))}
                 </div>
-                <button style={btn} onClick={() => addItem(`/api/certifications/`, { ...certForm, resume_id: parseInt(id) }, () => setCertForm({ name: "", issuer: "", issue_date: "", expiry_date: "" }), "certs")}>+ Add Certification</button>
+                <button style={{ ...btn, fontFamily: "inherit", marginTop: 8 }} onClick={() => addItem(`/api/certifications/`, { ...certForm, resume_id: parseInt(id) }, () => setCertForm({ name: "", issuer: "", issue_date: "", expiry_date: "" }), "certs")}>+ Add Certification</button>
               </div>
             )}
           </div>
         </div>
 
         {/* RIGHT — Live Preview */}
-        <div style={{ overflowY: "auto", background: "#e5e7eb", padding: "20px 0", display: "flex", justifyContent: "center" }}>
+        <div style={{ overflowY: "auto", background: "linear-gradient(180deg, #e2e8f0 0%, #cbd5e1 100%)", padding: "24px 0", display: "flex", justifyContent: "center" }}>
           
           {/* ✅ The A4 Canvas Wrapper */}
           <div 
             ref={componentRef} 
             style={{ 
               background: "#fff", 
-              width: "210mm",       /* Exact A4 Width */
-              minHeight: "297mm",
+              width: "210mm",
+              height: "297mm",
+              overflow: "hidden",
               boxSizing: "border-box",
               position: "relative",
               boxShadow: "0 4px 24px rgba(0,0,0,0.1)", 
@@ -2909,8 +3080,7 @@ export default function ResumeBuilder() {
               printColorAdjust: "exact" 
             }}
           >
-            {/* The flex: 1 here tells the preview to stretch and fill the whole 297mm height */}
-            <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
+            <div ref={innerRef} style={{ display: "flex", flexDirection: "column" }}>
               <ResumePreview 
                 resume={resume} 
                 experiences={experiences} 

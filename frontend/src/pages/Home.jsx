@@ -1,6 +1,5 @@
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
-import Button from "../components/ui/Button";
 
 import {
   FileText,
@@ -50,83 +49,72 @@ export default function Home() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 text-gray-900 font-sans">
+    <div style={{ minHeight: "100vh", fontFamily: "'Inter', system-ui, sans-serif", color: "#0f172a" }}>
+
+      <style>{`
+        @keyframes home-fade { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .home-feature { transition: all 0.3s ease; border: 1px solid #e2e8f0; }
+        .home-feature:hover { transform: translateY(-4px); box-shadow: 0 16px 40px -12px rgba(99,102,241,0.12); border-color: #c7d2fe; }
+        .home-cta { transition: all 0.3s ease; }
+        .home-cta:hover { transform: translateY(-2px); box-shadow: 0 12px 32px -8px rgba(99,102,241,0.4); }
+      `}</style>
 
       {/* NAVBAR */}
-      <header className="sticky top-0 z-50 bg-white/80 backdrop-blur border-b border-gray-200 shadow-sm">
-        <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-          {/* Logo */}
-          <div className="flex items-center gap-2">
-            <div className="h-8 w-8 flex items-center justify-center rounded-lg bg-blue-600">
-              <FileText className="h-4 w-4 text-white" />
+      <header style={{ position: "sticky", top: 0, zIndex: 50, background: "rgba(255,255,255,0.85)", backdropFilter: "blur(16px)", WebkitBackdropFilter: "blur(16px)", borderBottom: "1px solid rgba(226,232,240,0.6)" }}>
+        <div style={{ maxWidth: 1120, margin: "0 auto", padding: "0 24px", height: 64, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <div style={{ width: 34, height: 34, borderRadius: 10, background: "linear-gradient(135deg, #6366f1, #8b5cf6)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <FileText style={{ width: 16, height: 16, color: "#fff" }} />
             </div>
-            <span className="text-lg font-bold tracking-tight">ResumeAI</span>
+            <span style={{ fontSize: 18, fontWeight: 800, letterSpacing: "-0.02em" }}>Resume<span style={{ color: "#6366f1" }}>AI</span></span>
           </div>
 
-          {/* CTA */}
-          {user ? (
-            <Button onClick={() => navigate("/dashboard")} className="gap-2">
-              Dashboard <ArrowRight className="h-4 w-4" />
-            </Button>
-          ) : (
-            <Button onClick={() => navigate("/login")} className="gap-2">
-              Get Started <ArrowRight className="h-4 w-4" />
-            </Button>
-          )}
+          <button className="home-cta" onClick={() => navigate(user ? "/dashboard" : "/login")}
+            style={{ display: "flex", alignItems: "center", gap: 8, background: "linear-gradient(135deg, #6366f1, #8b5cf6)", color: "#fff", border: "none", padding: "9px 20px", borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: "pointer" }}>
+            {user ? "Dashboard" : "Get Started"} <ArrowRight style={{ width: 16, height: 16 }} />
+          </button>
         </div>
       </header>
 
       {/* HERO */}
-      <section className="max-w-4xl mx-auto px-6 py-24 text-center">
-        {/* Badge */}
-        <div className="inline-flex items-center gap-2 bg-blue-50 text-blue-700 border border-blue-200 px-4 py-1.5 rounded-full text-sm font-medium mb-6">
-          <Sparkles className="h-4 w-4" />
+      <section style={{ maxWidth: 900, margin: "0 auto", padding: "80px 24px 60px", textAlign: "center", animation: "home-fade 0.6s ease" }}>
+        <div style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "#eef2ff", color: "#4f46e5", border: "1px solid #c7d2fe", padding: "6px 16px", borderRadius: 20, fontSize: 13, fontWeight: 600, marginBottom: 24 }}>
+          <Sparkles style={{ width: 16, height: 16 }} />
           AI-Powered Resume Builder
         </div>
 
-        {/* Headline */}
-        <h1 className="text-5xl md:text-6xl font-bold leading-tight tracking-tight mb-6">
+        <h1 style={{ fontSize: "clamp(36px, 5vw, 56px)", fontWeight: 800, lineHeight: 1.1, letterSpacing: "-0.03em", margin: "0 0 20px" }}>
           Build{" "}
-          <span className="bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent">
+          <span style={{ background: "linear-gradient(135deg, #6366f1, #8b5cf6)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
             ATS-Friendly
           </span>{" "}
           Resumes in Minutes
         </h1>
 
-        {/* Subheading */}
-        <p className="text-lg text-gray-500 mb-10 max-w-2xl mx-auto">
-          Create professional resumes with AI-powered suggestions, multiple templates,
-          and instant PDF downloads. Stand out to recruiters and pass ATS screening.
+        <p style={{ fontSize: 18, color: "#64748b", maxWidth: 600, margin: "0 auto 36px", lineHeight: 1.6 }}>
+          Create professional resumes with AI-powered suggestions, multiple templates, and instant PDF downloads.
         </p>
 
-        {/* CTA Button */}
-        <Button
-          size="lg"
-          onClick={() => navigate(user ? "/Dashboard" : "/login")}
-          className="gap-2 px-8 mx-auto"
-        >
-          Start Building <ArrowRight className="h-4 w-4" />
-        </Button>
+        <button className="home-cta" onClick={() => navigate(user ? "/dashboard" : "/login")}
+          style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "linear-gradient(135deg, #6366f1, #8b5cf6)", color: "#fff", border: "none", padding: "14px 32px", borderRadius: 12, fontSize: 16, fontWeight: 700, cursor: "pointer" }}>
+          Start Building <ArrowRight style={{ width: 18, height: 18 }} />
+        </button>
       </section>
 
       {/* FEATURES */}
-      <section className="border-t border-gray-200 bg-white py-20">
-        <div className="max-w-6xl mx-auto px-6">
-          <h2 className="text-3xl font-bold text-center mb-12 tracking-tight">
-            Everything You Need
-          </h2>
+      <section style={{ borderTop: "1px solid #e2e8f0", background: "#fff", padding: "72px 0" }}>
+        <div style={{ maxWidth: 1120, margin: "0 auto", padding: "0 24px" }}>
+          <h2 style={{ fontSize: 30, fontWeight: 800, textAlign: "center", marginBottom: 48, letterSpacing: "-0.02em" }}>Everything You Need</h2>
 
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <div style={{ display: "grid", gap: 20, gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))" }}>
             {features.map(({ icon: Icon, title, desc }, i) => (
-              <div
-                key={i}
-                className="rounded-xl border border-gray-200 bg-gray-50 p-6 hover:shadow-md transition-shadow duration-200"
-              >
-                <div className="mb-4 h-10 w-10 flex items-center justify-center rounded-lg bg-blue-100">
-                  <Icon className="h-5 w-5 text-blue-600" />
+              <div key={i} className="home-feature"
+                style={{ borderRadius: 14, background: "#fafbfc", padding: 24, animation: `home-fade 0.5s ease ${i * 0.08}s both` }}>
+                <div style={{ width: 40, height: 40, borderRadius: 10, background: "#eef2ff", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 14 }}>
+                  <Icon style={{ width: 20, height: 20, color: "#6366f1" }} />
                 </div>
-                <h3 className="font-semibold mb-2">{title}</h3>
-                <p className="text-sm text-gray-500">{desc}</p>
+                <h3 style={{ fontSize: 16, fontWeight: 700, margin: "0 0 6px" }}>{title}</h3>
+                <p style={{ fontSize: 14, color: "#64748b", margin: 0, lineHeight: 1.5 }}>{desc}</p>
               </div>
             ))}
           </div>
@@ -134,9 +122,9 @@ export default function Home() {
       </section>
 
       {/* FOOTER */}
-      <footer className="border-t border-gray-200 py-8 bg-gray-50">
-        <div className="text-center text-sm text-gray-400">
-          © {new Date().getFullYear()} ResumeAI. Build professional resumes with AI.
+      <footer style={{ borderTop: "1px solid #e2e8f0", padding: "32px 0", background: "linear-gradient(135deg, #f8fafc, #eef2ff)" }}>
+        <div style={{ textAlign: "center", fontSize: 13, color: "#94a3b8" }}>
+          &copy; {new Date().getFullYear()} ResumeAI. Build professional resumes with AI.
         </div>
       </footer>
     </div>

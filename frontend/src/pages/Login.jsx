@@ -34,99 +34,62 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-50 to-gray-100 px-4">
+    <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", background: "linear-gradient(135deg, #eef2ff 0%, #f5f3ff 50%, #faf5ff 100%)", padding: "16px", fontFamily: "'Inter', system-ui, sans-serif" }}>
+
+      <style>{`
+        @keyframes login-fade { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .login-input { width: 100%; padding: 12px 16px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 14px; outline: none; transition: all 0.2s ease; background: #f8fafc; box-sizing: border-box; }
+        .login-input:focus { border-color: #6366f1; background: #fff; box-shadow: 0 0 0 3px rgba(99,102,241,0.1); }
+        .login-btn { width: 100%; padding: 12px; border: none; border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer; transition: all 0.3s ease; background: linear-gradient(135deg, #6366f1, #8b5cf6); color: #fff; }
+        .login-btn:hover { transform: translateY(-1px); box-shadow: 0 8px 24px -6px rgba(99,102,241,0.4); }
+        .login-btn:disabled { opacity: 0.6; transform: none; box-shadow: none; cursor: not-allowed; }
+      `}</style>
 
       {/* Logo */}
-      <div className="flex items-center gap-3 mb-8">
-        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-teal-400 flex items-center justify-center shadow-md">
-          <svg width="20" height="20" fill="none" viewBox="0 0 24 24">
-            <path
-              d="M7 8h10M7 12h6M7 16h8M5 3h14a2 2 0 012 2v14a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2z"
-              stroke="white"
-              strokeWidth="2"
-              strokeLinecap="round"
-            />
-          </svg>
+      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 32, animation: "login-fade 0.5s ease" }}>
+        <div style={{ width: 40, height: 40, borderRadius: 12, background: "linear-gradient(135deg, #6366f1, #8b5cf6)", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 4px 12px -2px rgba(99,102,241,0.4)" }}>
+          <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path d="M7 8h10M7 12h6M7 16h8M5 3h14a2 2 0 012 2v14a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2z" stroke="white" strokeWidth="2.5" strokeLinecap="round"/></svg>
         </div>
-        <span className="text-2xl font-bold text-gray-800 tracking-tight">
-          ResumeAI
-        </span>
+        <span style={{ fontSize: 24, fontWeight: 800, color: "#0f172a", letterSpacing: "-0.02em" }}>Resume<span style={{ color: "#6366f1" }}>AI</span></span>
       </div>
 
       {/* Card */}
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-8 border border-gray-100">
-        <h2 className="text-2xl font-bold text-center text-gray-900 mb-1">
-          Welcome back
-        </h2>
-        <p className="text-sm text-center text-gray-500 mb-6">
-          Sign in to manage your resumes
-        </p>
+      <div style={{ background: "#fff", borderRadius: 20, boxShadow: "0 20px 60px -12px rgba(99,102,241,0.12), 0 0 0 1px rgba(226,232,240,0.6)", width: "100%", maxWidth: 420, padding: 36, animation: "login-fade 0.6s ease 0.1s both" }}>
+        <h2 style={{ fontSize: 24, fontWeight: 800, textAlign: "center", color: "#0f172a", margin: "0 0 4px", letterSpacing: "-0.02em" }}>Welcome back</h2>
+        <p style={{ fontSize: 14, textAlign: "center", color: "#64748b", margin: "0 0 28px" }}>Sign in to manage your resumes</p>
 
-        <form onSubmit={handleSubmit} className="space-y-5">
-
-          {/* Email */}
+        <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 20 }}>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Email
-            </label>
-            <input
-              type="email"
-              name="email"
-              placeholder="you@example.com"
-              value={form.email}
-              onChange={handleChange}
-              className="w-full p-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
-              required
-            />
+            <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: "#334155", marginBottom: 6 }}>Email</label>
+            <input type="email" name="email" placeholder="you@example.com" value={form.email} onChange={handleChange} className="login-input" required />
           </div>
 
-          {/* Password */}
           <div>
-            <div className="flex justify-between items-center mb-1">
-              <label className="text-sm font-medium text-gray-700">
-                Password
-              </label>
-              
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
+              <label style={{ fontSize: 13, fontWeight: 600, color: "#334155" }}>Password</label>
             </div>
-
-            <input
-              type="password"
-              name="password"
-              placeholder="••••••••"
-              value={form.password}
-              onChange={handleChange}
-              className="w-full p-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
-              required
-            />
-            <Link
-                to="/forgot-password"
-                className="text-sm text-blue-600 hover:underline"
-              >
-                Forgot Password?
-              </Link>
+            <input type="password" name="password" placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢" value={form.password} onChange={handleChange} className="login-input" required />
+            <Link to="/forgot-password" style={{ fontSize: 13, color: "#6366f1", textDecoration: "none", fontWeight: 500, display: "inline-block", marginTop: 6 }}
+              onMouseEnter={e => e.currentTarget.style.textDecoration = "underline"}
+              onMouseLeave={e => e.currentTarget.style.textDecoration = "none"}>
+              Forgot Password?
+            </Link>
           </div>
 
-          {/* Button */}
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-semibold text-sm transition-all duration-200 shadow-md hover:shadow-lg disabled:opacity-60"
-          >
+          <button type="submit" disabled={loading} className="login-btn">
             {loading ? "Signing in..." : "Sign In"}
           </button>
         </form>
 
-        {/* Register */}
-        <p className="text-sm mt-6 text-center text-gray-500">
-          Don’t have an account?{" "}
-          <span
-            onClick={() => navigate("/register")}
-            className="text-blue-600 cursor-pointer font-medium hover:underline"
-          >
+        <p style={{ fontSize: 14, marginTop: 24, textAlign: "center", color: "#64748b" }}>
+          Don{"'"}t have an account?{" "}
+          <span onClick={() => navigate("/register")} style={{ color: "#6366f1", cursor: "pointer", fontWeight: 600 }}
+            onMouseEnter={e => e.currentTarget.style.textDecoration = "underline"}
+            onMouseLeave={e => e.currentTarget.style.textDecoration = "none"}>
             Sign up
           </span>
         </p>
       </div>
     </div>
   );
-}
+}

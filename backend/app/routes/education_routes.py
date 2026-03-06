@@ -63,6 +63,30 @@ def get_education(resume_id):
         } for edu in education_list
     ]), 200
 
+@education_bp.route("/<int:edu_id>", methods=["PUT"])
+@jwt_required()
+def update_education(edu_id):
+    user_id = get_jwt_identity()
+    data = request.get_json()
+
+    education = Education.query.get(edu_id)
+    if not education:
+        return jsonify({"error": "Education entry not found"}), 404
+
+    resume = Resume.query.filter_by(id=education.resume_id, user_id=int(user_id)).first()
+    if not resume:
+        return jsonify({"error": "Unauthorized"}), 403
+
+    education.degree = data.get("degree", education.degree)
+    education.institution = data.get("institution", education.institution)
+    education.start_year = data.get("start_year", education.start_year)
+    education.end_year = data.get("end_year", education.end_year)
+    education.score = data.get("score", education.score)
+
+    db.session.commit()
+    return jsonify({"message": "Education updated successfully"}), 200
+
+
 @education_bp.route("/<int:edu_id>", methods=["DELETE"])
 @jwt_required()
 def delete_education(edu_id):

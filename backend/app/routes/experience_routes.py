@@ -65,6 +65,30 @@ def get_experience(resume_id):
     ]), 200
 
 
+@experience_bp.route("/<int:experience_id>", methods=["PUT"])
+@jwt_required()
+def update_experience(experience_id):
+    user_id = get_jwt_identity()
+    data = request.get_json()
+
+    experience = Experience.query.get(experience_id)
+    if not experience:
+        return jsonify({"error": "Not found"}), 404
+
+    resume = Resume.query.filter_by(id=experience.resume_id, user_id=int(user_id)).first()
+    if not resume:
+        return jsonify({"error": "Unauthorized"}), 403
+
+    experience.company = data.get("company", experience.company)
+    experience.role = data.get("role", experience.role)
+    experience.description = data.get("description", experience.description)
+    experience.start_date = data.get("start_date", experience.start_date)
+    experience.end_date = data.get("end_date", experience.end_date)
+
+    db.session.commit()
+    return jsonify({"message": "Experience updated successfully"}), 200
+
+
 @experience_bp.route("/<int:experience_id>", methods=["DELETE"])
 @jwt_required()
 def delete_experience(experience_id):

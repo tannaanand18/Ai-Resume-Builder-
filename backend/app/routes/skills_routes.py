@@ -56,6 +56,27 @@ def get_skills(resume_id):
     ]), 200
 
 
+@skill_bp.route("/<int:skill_id>", methods=["PUT"])
+@jwt_required()
+def update_skill(skill_id):
+    user_id = get_jwt_identity()
+    data = request.get_json()
+
+    skill = Skill.query.get(skill_id)
+    if not skill:
+        return jsonify({"error": "Not found"}), 404
+
+    resume = Resume.query.filter_by(id=skill.resume_id, user_id=int(user_id)).first()
+    if not resume:
+        return jsonify({"error": "Unauthorized"}), 403
+
+    skill.skill_name = data.get("name", skill.skill_name)
+    skill.level = data.get("level", skill.level)
+
+    db.session.commit()
+    return jsonify({"message": "Skill updated successfully"}), 200
+
+
 @skill_bp.route("/<int:skill_id>", methods=["DELETE"])
 @jwt_required()
 def delete_skill(skill_id):
