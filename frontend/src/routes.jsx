@@ -6,6 +6,9 @@ import Dashboard from "./pages/Dashboard";
 import ResumeBuilder from "./pages/ResumeBuilder"; 
 import { useAuth } from "./context/AuthContext";
 import TemplateSelect from "./pages/TemplateSelect";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/resetpassword";
+
 
 
 function PrivateRoute({ children }) {
@@ -24,6 +27,8 @@ export default function AppRoutes() {
         <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
         <Route path="/resume/:id/edit" element={<PrivateRoute><ResumeBuilder /></PrivateRoute>} />
         <Route path="/resume/new" element={<PrivateRoute><TemplateSelect /></PrivateRoute>} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password/:token" element={<ResetPassword />} /> 
       </Routes>
     </BrowserRouter>
   );

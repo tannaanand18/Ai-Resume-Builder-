@@ -1,6 +1,6 @@
 from flask import Flask
 from .config import Config
-from .extensions import db, jwt, bcrypt
+from .extensions import db, jwt, bcrypt, mail
 from flask_cors import CORS
 
 # Import Blueprints
@@ -22,17 +22,18 @@ def create_app():
 
     # Enable CORS for frontend (React running on port 5173 or 3000)
     CORS(
-    app,
-    resources={r"/api/*": {"origins": "http://localhost:5173"}},
-    supports_credentials=True
+        app,
+        resources={r"/api/*": {"origins": "http://localhost:5173"}},
+        supports_credentials=True
     )
 
     # Initialize Extensions
-    db.init_app(app)
     jwt.init_app(app)
+    db.init_app(app)
     bcrypt.init_app(app)
+    mail.init_app(app)
 
-    # Register Blueprints with prefix (VERY IMPORTANT)
+    # Register Blueprints with prefix
     app.register_blueprint(auth, url_prefix="/api/auth")
     app.register_blueprint(resume_bp, url_prefix="/api/resume")
     app.register_blueprint(education_bp, url_prefix="/api/education")

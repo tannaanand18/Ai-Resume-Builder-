@@ -1,11 +1,14 @@
 from flask import Blueprint, request, jsonify
-from app.extensions import db, bcrypt
+from app.extensions import db, bcrypt, mail
 from app.models.user import User
-from flask_jwt_extended import create_access_token
+from flask_mail import Message
+import secrets
+from datetime import datetime, timedelta
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity, get_jwt
 
 
 auth = Blueprint("auth", __name__)
+
 
 @auth.route("/register", methods=["POST"])
 def register():
@@ -38,6 +41,7 @@ def register():
 
     return jsonify({"message": "User registered successfully"}), 201
 
+
 @auth.route("/login", methods=["POST"])
 def login():
     data = request.get_json()
@@ -57,10 +61,10 @@ def login():
         return jsonify({"error": "Invalid credentials"}), 401
 
     access_token = create_access_token(
-    identity=str(user.id),   # MUST be string
-    additional_claims={
-        "email": user.email,
-        "role": user.role
+        identity=str(user.id),   # MUST be string
+        additional_claims={
+            "email": user.email,
+            "role": user.role
         }
     )
 
@@ -70,6 +74,7 @@ def login():
         "email": user.email,
         "role": user.role
     }), 200
+
 
 @auth.route("/profile", methods=["GET"])
 @jwt_required()
@@ -82,6 +87,7 @@ def profile():
         "email": claims["email"],
         "role": claims["role"]
     })
+
 
 @auth.route("/admin-test", methods=["GET"])
 @jwt_required()
@@ -96,3 +102,85 @@ def admin_test():
         "email": claims["email"],
         "role": claims["role"]
     })
+
+
+# -------------------------------
+# Forgot Password
+# -------------------------------
+
+@auth.route("/forgot-password", methods=["POST"])
+def forgot_password():
+
+    data = request.get_json()
+    email = data.get("email")
+
+    if not email:
+        return jsonify({"error": "Email is required"}), 400
+
+    user = User.query.filter_by(email=email).first()
+
+    # Security: don't reveal if email exists
+    if not user:
+        return jsonify({"message": "If email exists, reset link sent"}), 200
+
+    # Generate token
+    token = secrets.token_urlsafe(32)
+
+    # Expiry time
+    expiry = datetime.utcnow() + timedelta(minutes=15)
+
+    user.reset_token = token
+    user.reset_token_expiry = expiry
+
+    db.session.commit()
+
+    # Reset link
+    reset_link = f"http://localhost:5173/reset-password/{token}"
+
+    msg = Message(
+        subject="Reset Your ResumeAI Password",
+        recipients=[email],
+        body=f"""
+Click the link below to reset your password:
+
+{reset_link}
+
+This link will expire in 15 minutes.
+"""
+    )
+
+    mail.send(msg)
+
+    return jsonify({"message": "Reset email sent"})
+
+
+# -------------------------------
+# Reset Password
+# -------------------------------
+
+@auth.route("/reset-password/<token>", methods=["POST"])
+def reset_password(token):
+
+    data = request.get_json()
+    new_password = data.get("password")
+
+    if not new_password:
+        return jsonify({"error": "Password is required"}), 400
+
+    user = User.query.filter_by(reset_token=token).first()
+
+    if not user:
+        return jsonify({"error": "Invalid token"}), 400
+
+    if user.reset_token_expiry < datetime.utcnow():
+        return jsonify({"error": "Token expired"}), 400
+
+    hashed_password = bcrypt.generate_password_hash(new_password).decode("utf-8")
+
+    user.password = hashed_password
+    user.reset_token = None
+    user.reset_token_expiry = None
+
+    db.session.commit()
+
+    return jsonify({"message": "Password reset successful"})
