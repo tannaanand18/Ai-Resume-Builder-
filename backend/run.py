@@ -1,8 +1,16 @@
+import os
+import sys
+
+# Ensure the backend directory is in the Python path
+# This handles both running from repo root and backend/ directory
+backend_dir = os.path.dirname(os.path.abspath(__file__))
+if backend_dir not in sys.path:
+    sys.path.insert(0, backend_dir)
+
 from app import create_app
 from flask import jsonify
 from app.extensions import db
 from sqlalchemy import text
-import os
 
 
 app = create_app()   # FIRST create app
