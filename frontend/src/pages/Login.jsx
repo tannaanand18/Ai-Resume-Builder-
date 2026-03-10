@@ -16,22 +16,23 @@ export default function Login() {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
+  e.preventDefault();
+  setLoading(true);
 
-    try {
-      const data = await loginUser(form);
-      data.email = form.email;
-      login(data);
+  try {
+    // ✅ CHANGED: Now loginUser doesn't return token, cookie is set automatically
+    const data = await loginUser(form);
+    data.email = form.email;
+    login(data);  // This will update AuthContext without token
 
-      toast.success("Login successful!");
-      navigate("/dashboard", { replace: true });
-    } catch (err) {
-      toast.error("Invalid email or password");
-    } finally {
-      setLoading(false);
-    }
-  };
+    toast.success("Login successful!");
+    navigate("/dashboard", { replace: true });
+  } catch (err) {
+    toast.error("Invalid email or password");
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", background: "linear-gradient(135deg, #eef2ff 0%, #f5f3ff 50%, #faf5ff 100%)", padding: "16px", fontFamily: "'Inter', system-ui, sans-serif" }}>
@@ -92,4 +93,4 @@ export default function Login() {
       </div>
     </div>
   );
-}
+}

@@ -1,10 +1,16 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify,make_response
 from app.extensions import db, bcrypt, mail
 from app.models.user import User
 from flask_mail import Message
 import secrets
 from datetime import datetime, timedelta
-from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity, get_jwt
+from flask_jwt_extended import (
+    create_access_token, 
+    jwt_required, 
+    get_jwt_identity, 
+    get_jwt,
+    unset_jwt_cookies  # ✅ NEW: For logout
+)
 
 
 auth = Blueprint("auth", __name__)
@@ -46,36 +52,91 @@ def register():
 # -------------------------------
 @auth.route("/login", methods=["POST"])
 def login():
-    data = request.get_json()
+    """
+    Login user and set JWT token in httpOnly cookie
+    """
+    try:
+        data = request.get_json()
 
-    email = data.get("email")
-    password = data.get("password")
+        email = data.get("email")
+        password = data.get("password")
 
-    if not email or not password:
-        return jsonify({"error": "Email and password are required"}), 400
+        if not email or not password:
+            return jsonify({"error": "Email and password are required"}), 400
 
-    user = User.query.filter_by(email=email).first()
+        user = User.query.filter_by(email=email).first()
 
-    if not user:
-        return jsonify({"error": "Invalid credentials"}), 401
+        if not user:
+            return jsonify({"error": "Invalid credentials"}), 401
 
-    if not bcrypt.check_password_hash(user.password, password):
-        return jsonify({"error": "Invalid credentials"}), 401
+        if not bcrypt.check_password_hash(user.password, password):
+            return jsonify({"error": "Invalid credentials"}), 401
 
-    access_token = create_access_token(
-        identity=str(user.id),
-        additional_claims={
+        # Create JWT token with 7-day expiry
+        access_token = create_access_token(
+            identity=str(user.id),
+            additional_claims={
+                "email": user.email,
+                "role": user.role
+            },
+            expires_delta=timedelta(days=7)  # ✅ Token expires in 7 days
+        )
+
+        # ✅ CREATE RESPONSE WITH COOKIE
+        response = make_response(jsonify({
+            "message": "Login successful",
             "email": user.email,
-            "role": user.role
-        }
-    )
+            "role": user.role,
+            "user_id": user.id
+        }), 200)
 
-    return jsonify({
-        "message": "Login successful",
-        "access_token": access_token,
-        "email": user.email,
-        "role": user.role
-    }), 200
+        # ✅ SET HTTPONLY COOKIE (Secure & Auto-sent)
+        response.set_cookie(
+            key="access_token_cookie",      # Cookie name
+            value=access_token,             # JWT token
+            httponly=True,                  # 🔒 JavaScript can't access it (XSS protection)
+            secure=False,                   # Set True in production with HTTPS
+            samesite="Lax",                 # CSRF protection
+            max_age=7*24*60*60,            # 7 days in seconds
+            path="/"                        # Available for all routes
+        )
+
+        print(f"✅ Login successful for {email}, cookie set")
+        return response
+
+    except Exception as e:
+        print(f"❌ Login error: {str(e)}")
+        return jsonify({"error": "Login failed"}), 500
+    
+#########################Logout Route#########################
+@auth.route("/logout", methods=["POST"])
+def logout():
+    """
+    Logout user by clearing the JWT cookie
+    """
+    try:
+        response = make_response(jsonify({
+            "message": "Logged out successfully"
+        }), 200)
+        
+        # ✅ DELETE THE COOKIE
+        response.set_cookie(
+            key="access_token_cookie",
+            value="",                       # Empty value
+            httponly=True,
+            secure=False,
+            samesite="Lax",
+            max_age=0,                      # Expires immediately
+            path="/"
+        )
+        
+        print("✅ User logged out, cookie cleared")
+        return response
+
+    except Exception as e:
+        print(f"❌ Logout error: {str(e)}")
+        return jsonify({"error": "Logout failed"}), 500    
+
 
 
 # -------------------------------

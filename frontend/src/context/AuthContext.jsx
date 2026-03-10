@@ -16,15 +16,15 @@ export function AuthProvider({ children }) {
   }, []);
 
   const login = (data) => {
-    localStorage.setItem("token", data.access_token);
+   
     const userData = { email: data.email, role: data.role };
-    localStorage.setItem("user", JSON.stringify(userData));
+    
     setUser(userData);
   };
 
   const logout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
+    
+    
     setUser(null);
   };
 

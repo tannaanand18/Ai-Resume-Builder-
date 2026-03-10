@@ -9,39 +9,33 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true); // Starts strictly as loading
   const navigate = useNavigate();
 
-  const fetchResumes = async (token) => {
-    try {
-      const res = await fetch("/api/resume/all", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+  const fetchResumes = async () => {  // ✅ REMOVED: token parameter
+  try {
+    const res = await fetch("/api/resume/all", {
+      credentials: "include",  // ✅ ADDED: Auto-sends cookie
+      // ✅ REMOVED: Authorization header - cookie handles it now
+    });
 
-      if (!res.ok) {
-        throw new Error("Failed to fetch resumes");
-      }
-
-      const data = await res.json();
-      setResumes(Array.isArray(data) ? data : []);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      // ONLY set loading to false AFTER the data is safely locked in state
-      setLoading(false); 
+    if (!res.ok) {
+      throw new Error("Failed to fetch resumes");
     }
-  };
+
+    const data = await res.json();
+    setResumes(Array.isArray(data) ? data : []);
+  } catch (err) {
+    console.error(err);
+  } finally {
+    setLoading(false); 
+  }
+};
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      navigate("/login");
-      return;
-    }
-
-    // Force loading to true every time we refetch
-    setLoading(true); 
-    fetchResumes(token);
-  }, [navigate]);
+  // ✅ REMOVED: localStorage check - cookie handles authentication
+  
+  // Force loading to true every time we refetch
+  setLoading(true); 
+  fetchResumes();  // ✅ REMOVED: token parameter
+}, [navigate]);
 
   const createResume = () => {
     navigate("/resume/new");
@@ -77,10 +71,23 @@ export default function Dashboard() {
     }
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {  // ✅ CHANGED: Made async
+  try {
+    // ✅ ADDED: Call logout endpoint to clear cookie
+    await fetch("/api/auth/logout", {
+      method: "POST",
+      credentials: "include",  // Send cookie to be cleared
+    });
+    
+    logout();  // Clear AuthContext
+    navigate("/login");
+  } catch (err) {
+    console.error("Logout error:", err);
+    // Still navigate to login even if API fails
     logout();
     navigate("/login");
-  };
+  }
+};
 
   return (
     <div style={{ minHeight: "100vh", background: "linear-gradient(135deg, #f8fafc 0%, #eef2ff 50%, #f5f3ff 100%)", fontFamily: "'Inter', system-ui, sans-serif" }}>

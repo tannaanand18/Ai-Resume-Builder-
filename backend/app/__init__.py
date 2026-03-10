@@ -1,7 +1,8 @@
-from flask import Flask, app
+from flask import Flask
 from .config import Config
 from .extensions import db, jwt, bcrypt, mail
 from flask_cors import CORS
+from datetime import timedelta  # ✅ ADDED: For token expiry
 
 # Import Blueprints
 from .routes.auth_routes import auth
@@ -20,13 +21,21 @@ def create_app():
 
     # Load Configuration
     app.config.from_object(Config)
+    
+    # ✅ ADDED: JWT Cookie Configuration (5 lines)
+    app.config["JWT_TOKEN_LOCATION"] = ["cookies"]           # Look for JWT in cookies
+    app.config["JWT_COOKIE_SECURE"] = False                  # Set True in production with HTTPS
+    app.config["JWT_COOKIE_CSRF_PROTECT"] = False            # Disable CSRF for now (can enable later)
+    app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(days=7)  # Token expires in 7 days
+    app.config["JWT_COOKIE_SAMESITE"] = "Lax"               # CSRF protection
 
     # Enable CORS for frontend (React running on port 5173 or 3000)
+    # ✅ KEEP supports_credentials=True (already correct!)
     CORS(
-    app,
-    resources={r"/api/*": {"origins": "*"}},
-    supports_credentials=True
-)
+        app,
+        resources={r"/api/*": {"origins": "*"}},
+        supports_credentials=True  # ✅ This allows cookies to be sent/received
+    )
 
     # Initialize Extensions
     jwt.init_app(app)
