@@ -1,7 +1,7 @@
 import pymysql
 pymysql.install_as_MySQLdb()
 
-from flask import Flask
+from flask import Flask, app
 from .config import Config
 from .extensions import db, jwt, bcrypt, mail
 from flask_cors import CORS
@@ -28,18 +28,27 @@ def create_app():
 
     # JWT Configuration
     app.config["JWT_SECRET_KEY"] = "jwtsecret"
-    app.config["JWT_TOKEN_LOCATION"] = ["headers"]
-    app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(days=7)
-    
 
+    app.config["JWT_TOKEN_LOCATION"] = ["cookies"]
+
+    app.config["JWT_COOKIE_SECURE"] = True
+    app.config["JWT_COOKIE_SAMESITE"] = "None"
+    app.config["JWT_COOKIE_CSRF_PROTECT"] = False
+
+    app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(days=7)
+    app.config["JWT_ACCESS_COOKIE_NAME"] = "access_token_cookie"
     # Enable CORS for frontend
     CORS(
     app,
-    supports_credentials=True,
-    origins=[
-        "http://localhost:5173",
-        "https://ai-resume-builder-git-main-anands-projects-45523b63.vercel.app"
-    ]
+    resources={
+        r"/api/*": {
+            "origins": [
+                "http://localhost:5173",
+                "https://ai-resume-builder-git-main-anands-projects-45523b63.vercel.app"
+            ]
+        }
+    },
+    supports_credentials=True
 )
 
     # Initialize extensions
