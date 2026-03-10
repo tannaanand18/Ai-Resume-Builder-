@@ -28,7 +28,8 @@ export default function Login() {
     toast.success("Login successful!");
     navigate("/dashboard", { replace: true });
   } catch (err) {
-    toast.error("Invalid email or password");
+    const msg = err.response?.data?.error || "Login failed. Please try again.";
+    toast.error(msg);
   } finally {
     setLoading(false);
   }
