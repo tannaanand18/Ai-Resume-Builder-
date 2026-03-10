@@ -3,6 +3,7 @@ from app.extensions import db, bcrypt, mail
 from app.models.user import User
 from flask_mail import Message
 import secrets
+import os
 from datetime import datetime, timedelta
 from flask_jwt_extended import (
     create_access_token, 
@@ -87,14 +88,15 @@ def login():
         }), 200)
 
         # ✅ CRITICAL: Set the cookie
+        is_secure = request.is_secure
         response.set_cookie(
-            'access_token_cookie',          # Cookie name (must match JWT config)
-            value=access_token,              # JWT token value
-            max_age=7*24*60*60,             # 7 days in seconds
-            httponly=True,                   # Secure: JS can't access
-            secure=False,                    # False for HTTP (dev), True for HTTPS (prod)
-            samesite='None',                  # CSRF protection
-            path='/'                         # Available on all paths
+            'access_token_cookie',
+            value=access_token,
+            max_age=7*24*60*60,
+            httponly=True,
+            secure=is_secure,
+            samesite='None' if is_secure else 'Lax',
+            path='/'
         )
 
         # ✅ DEBUG: Confirm cookie was set
@@ -121,13 +123,14 @@ def logout():
         }), 200)
         
         # ✅ DELETE THE COOKIE
+        is_secure = request.is_secure
         response.set_cookie(
             key="access_token_cookie",
-            value="",                       # Empty value
+            value="",
             httponly=True,
-            secure=False,
-            samesite="None",
-            max_age=0,                      # Expires immediately
+            secure=is_secure,
+            samesite="None" if is_secure else "Lax",
+            max_age=0,
             path="/"
         )
         
@@ -252,7 +255,7 @@ def forgot_password():
     user.reset_token_expiry = expiry
     db.session.commit()
 
-    reset_link = f"http://localhost:5173/reset-password/{token}"
+    reset_link = f"{os.getenv('FRONTEND_URL', 'http://localhost:5173')}/reset-password/{token}"
 
     msg = Message(
         subject="Reset Your ResumeAI Password",

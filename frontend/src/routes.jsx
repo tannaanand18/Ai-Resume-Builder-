@@ -4,7 +4,7 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import ResumeBuilder from "./pages/ResumeBuilder"; 
-import {AuthProvider, useAuth } from "./context/AuthContext";
+import { useAuth } from "./context/AuthContext";
 import TemplateSelect from "./pages/TemplateSelect";
 import AdminPanel from "./pages/AdminPanel";
 import ForgotPassword from "./pages/ForgotPassword";
@@ -22,7 +22,6 @@ function PrivateRoute({ children }) {
 export default function AppRoutes() {
   return (
     <BrowserRouter>
-     <AuthProvider>
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
@@ -34,7 +33,6 @@ export default function AppRoutes() {
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password/:token" element={<ResetPassword />} /> 
       </Routes>
-      </AuthProvider>
     </BrowserRouter>
   );
 }

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
+import api from "../services/api";
 
 export default function ResetPassword() {
   const { token } = useParams();
@@ -13,25 +14,11 @@ export default function ResetPassword() {
     setLoading(true);
 
     try {
-      const res = await fetch(
-  `/api/auth/reset-password/${token}`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ password }),
-        }
-      );
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.error || "Something went wrong");
-      }
-
+      await api.post(`/auth/reset-password/${token}`, { password });
       toast.success("Password updated successfully!");
       navigate("/login");
     } catch (err) {
-      toast.error(err.message);
+      toast.error(err.response?.data?.error || "Something went wrong");
     } finally {
       setLoading(false);
     }

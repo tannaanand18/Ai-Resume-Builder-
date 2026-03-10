@@ -12,10 +12,10 @@ class Config:
     GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 
     JWT_ACCESS_TOKEN_EXPIRES = timedelta(days=7)
-    JWT_COOKIE_SAMESITE = "Lax" 
+    JWT_COOKIE_SAMESITE = "None"
     JWT_TOKEN_LOCATION = ["cookies"]
-    JWT_COOKIE_SECURE = False # Set to True in production with HTTPS
-    JWT_COOKIE_CSRF_PROTECT = False # Set to True in production for CSRF protection
+    JWT_COOKIE_SECURE = True
+    JWT_COOKIE_CSRF_PROTECT = False
       
 
     # Mail configuration

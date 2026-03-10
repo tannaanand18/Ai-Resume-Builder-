@@ -1,12 +1,12 @@
+import os
 import pymysql
 pymysql.install_as_MySQLdb()
 
-from flask import Flask, app
+from flask import Flask
 from werkzeug.middleware.proxy_fix import ProxyFix
 from .config import Config
 from .extensions import db, jwt, bcrypt, mail
 from flask_cors import CORS
-from datetime import timedelta
 
 # Import Blueprints
 from .routes.auth_routes import auth
@@ -24,33 +24,25 @@ def create_app():
     app = Flask(__name__)
     app.config['CORS_HEADERS'] = 'Content-Type'
 
-    # Load configuration
+    # Load configuration from Config class (includes JWT, DB, Mail settings)
     app.config.from_object(Config)
 
-    # JWT Configuration
-    app.config["JWT_SECRET_KEY"] = "jwtsecret"
-
-    app.config["JWT_TOKEN_LOCATION"] = ["cookies"]
-
-    app.config["JWT_COOKIE_SECURE"] = True
-    app.config["JWT_COOKIE_SAMESITE"] = "None"
-    app.config["JWT_COOKIE_CSRF_PROTECT"] = False
-
-    app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(days=7)
     app.config["JWT_ACCESS_COOKIE_NAME"] = "access_token_cookie"
-    app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
-    # Enable CORS for frontend
-    CORS(
-    app,
-    supports_credentials=True,
-    resources={r"/api/*": {"origins": [
-        "http://localhost:5173",
-        "https://ai-resume-builder-git-main-anands-projects-45523b63.vercel.app"
-    ]}},
-    allow_headers=["Content-Type", "Authorization"],
-    methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"]
-)
 
+    app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
+
+    # Enable CORS for frontend
+    frontend_url = os.getenv("FRONTEND_URL", "http://localhost:5173")
+    CORS(
+        app,
+        supports_credentials=True,
+        origins=[
+            "http://localhost:5173",
+            "http://localhost:5174",
+            "http://localhost:5175",
+            frontend_url,
+        ]
+    )
     # Initialize extensions
     jwt.init_app(app)
     db.init_app(app)

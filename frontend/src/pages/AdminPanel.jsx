@@ -1,14 +1,18 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { API_URL } from "../services/api";
 
 const TABS = ["Dashboard", "Users", "Resumes"];
 
 export default function AdminPanel() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
-  const token = localStorage.getItem("token");
-  const headers = { "Content-Type": "application/json", Authorization: `Bearer ${token}` };
+  const apiFetch = (path, opts = {}) => fetch(`${API_URL}${path}`, {
+    ...opts,
+    credentials: "include",
+    headers: { "Content-Type": "application/json", ...opts.headers },
+  });
 
   const [activeTab, setActiveTab] = useState(0);
   const [stats, setStats] = useState(null);
@@ -25,7 +29,7 @@ export default function AdminPanel() {
   // ─── FETCH ───
   const fetchStats = async () => {
     try {
-      const res = await fetch("/api/admin/stats", { headers });
+      const res = await apiFetch("/admin/stats");
       if (res.status === 403) { navigate("/dashboard"); return; }
       if (!res.ok) { console.error("Stats error:", res.status); return; }
       const data = await res.json();
@@ -35,7 +39,7 @@ export default function AdminPanel() {
 
   const fetchUsers = async () => {
     try {
-      const res = await fetch("/api/admin/users", { headers });
+      const res = await apiFetch("/admin/users");
       if (!res.ok) { console.error("Users error:", res.status); return; }
       const data = await res.json();
       console.log("Admin users loaded:", data.length);
@@ -45,7 +49,7 @@ export default function AdminPanel() {
 
   const fetchResumes = async () => {
     try {
-      const res = await fetch("/api/admin/resumes", { headers });
+      const res = await apiFetch("/admin/resumes");
       if (!res.ok) { console.error("Resumes error:", res.status); return; }
       const data = await res.json();
       console.log("Admin resumes loaded:", data.length);
@@ -60,14 +64,9 @@ export default function AdminPanel() {
   }, []);
 
   // ─── ACTIONS ───
-  const getAuthHeaders = () => ({
-    "Content-Type": "application/json",
-    Authorization: `Bearer ${localStorage.getItem("token")}`
-  });
-
   const deleteUser = async (userId) => {
     try {
-      const res = await fetch(`/api/admin/users/${userId}`, { method: "DELETE", headers: getAuthHeaders() });
+      const res = await apiFetch(`/admin/users/${userId}`, { method: "DELETE" });
       const data = await res.json();
       if (res.ok) {
         showToast("✅ " + data.message);
@@ -82,8 +81,8 @@ export default function AdminPanel() {
 
   const changeRole = async (userId, newRole) => {
     try {
-      const res = await fetch(`/api/admin/users/${userId}/role`, {
-        method: "PUT", headers: getAuthHeaders(), body: JSON.stringify({ role: newRole })
+      const res = await apiFetch(`/admin/users/${userId}/role`, {
+        method: "PUT", body: JSON.stringify({ role: newRole })
       });
       const data = await res.json();
       if (res.ok) {
@@ -96,7 +95,7 @@ export default function AdminPanel() {
 
   const deleteResume = async (resumeId) => {
     try {
-      const res = await fetch(`/api/admin/resumes/${resumeId}`, { method: "DELETE", headers: getAuthHeaders() });
+      const res = await apiFetch(`/admin/resumes/${resumeId}`, { method: "DELETE" });
       if (res.ok) {
         showToast("✅ Resume deleted");
         setResumes(prev => prev.filter(r => r.id !== resumeId));
