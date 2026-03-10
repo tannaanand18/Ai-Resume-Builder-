@@ -5,7 +5,7 @@
       "destination": "https://ai-resume-builder-bzgs.onrender.com/api/:path*"
     },
     {
-      "source": "/((?!assets/).*)",
+      "source": "/((?!api/).*)",
       "destination": "/index.html"
     }
   ]
