@@ -1,49 +1,71 @@
-import { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext, useState, useEffect } from 'react';
 
 const AuthContext = createContext();
 
-export function AuthProvider({ children }) {
+export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    const savedUser = localStorage.getItem("user");
-    if (token && savedUser) {
-      setUser(JSON.parse(savedUser));
-    }
-    setLoading(false);
+    checkAuth();
   }, []);
 
-  const login = (data) => {
-   
-    const userData = { email: data.email, role: data.role };
-    
+  const checkAuth = async () => {
+    try {
+      console.log('🔍 Checking authentication...');
+      
+      const res = await fetch('/api/auth/me', {
+        credentials: 'include',
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        console.log('✅ User authenticated:', data);
+        setUser(data);
+      } else {
+        console.log('❌ Not authenticated');
+        setUser(null);
+      }
+    } catch (err) {
+      console.error('❌ Auth check failed:', err);
+      setUser(null);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const login = (userData) => {
+    console.log('✅ Login - setting user:', userData);
     setUser(userData);
   };
 
-  const logout = () => {
-    
+  const logout = async () => {
+    try {
+      console.log('🚪 Logging out...');
+      await fetch('/api/auth/logout', {
+        method: 'POST',
+        credentials: 'include',
+      });
+      console.log('✅ Logout successful');
+    } catch (err) {
+      console.error('❌ Logout error:', err);
+    }
     
     setUser(null);
+    // ✅ Don't navigate here - let components handle it
   };
 
-  if (loading) {
-    return (
-      <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
-        <div style={{ width: 32, height: 32, border: "3px solid #2563eb", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.7s linear infinite" }} />
-        <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
-      </div>
-    );
-  }
-
   return (
-    <AuthContext.Provider value={{ user, setUser, login, logout, loading, isAuthenticated: !!user }}>
+    <AuthContext.Provider value={{ user, login, logout, loading, checkAuth }}>
       {children}
     </AuthContext.Provider>
   );
-}
+};
 
-export function useAuth() {
-  return useContext(AuthContext);
-}
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth must be used within AuthProvider');
+  }
+  return context;
+};

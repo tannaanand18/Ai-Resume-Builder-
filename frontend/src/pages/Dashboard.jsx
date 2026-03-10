@@ -4,38 +4,66 @@ import { useAuth } from "../context/AuthContext";
 import { resumeService } from "../services/resumeService";
 
 export default function Dashboard() {
-  const { user, logout } = useAuth();
+  const { user, logout, loading: authLoading } = useAuth();
   const [resumes, setResumes] = useState([]);
-  const [loading, setLoading] = useState(true); // Starts strictly as loading
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
-  const fetchResumes = async () => {  // ✅ REMOVED: token parameter
-  try {
-    const res = await fetch("/api/resume/all", {
-      credentials: "include",  // ✅ ADDED: Auto-sends cookie
-      // ✅ REMOVED: Authorization header - cookie handles it now
-    });
-
-    if (!res.ok) {
-      throw new Error("Failed to fetch resumes");
-    }
-
-    const data = await res.json();
-    setResumes(Array.isArray(data) ? data : []);
-  } catch (err) {
-    console.error(err);
-  } finally {
-    setLoading(false); 
+  // ✅ SHOW LOADING WHILE CHECKING AUTH
+  if (authLoading) {
+    return (
+      <div style={{ 
+        minHeight: "100vh", 
+        display: "flex", 
+        alignItems: "center", 
+        justifyContent: "center",
+        background: "linear-gradient(135deg, #f8fafc 0%, #eef2ff 50%, #f5f3ff 100%)"
+      }}>
+        <div style={{ 
+          width: 48, 
+          height: 48, 
+          border: "4px solid #e0e7ff", 
+          borderTopColor: "#6366f1", 
+          borderRadius: "50%", 
+          animation: "spin 0.8s linear infinite" 
+        }} />
+        <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+      </div>
+    );
   }
-};
+
+  // ✅ REDIRECT TO LOGIN IF NOT AUTHENTICATED
+  useEffect(() => {
+    if (!authLoading && !user) {
+      navigate('/login');
+    }
+  }, [authLoading, user, navigate]);
+
+  const fetchResumes = async () => {
+    try {
+      const res = await fetch("/api/resume/all", {
+        credentials: "include",  // ✅ Send cookie
+      });
+
+      if (!res.ok) {
+        throw new Error("Failed to fetch resumes");
+      }
+
+      const data = await res.json();
+      setResumes(Array.isArray(data) ? data : []);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false); 
+    }
+  };
 
   useEffect(() => {
-  // ✅ REMOVED: localStorage check - cookie handles authentication
-  
-  // Force loading to true every time we refetch
-  setLoading(true); 
-  fetchResumes();  // ✅ REMOVED: token parameter
-}, [navigate]);
+    if (user) {
+      setLoading(true);
+      fetchResumes();
+    }
+  }, [user]);
 
   const createResume = () => {
     navigate("/resume/new");
@@ -44,7 +72,7 @@ export default function Dashboard() {
   const duplicateResume = async (e, resume) => {
     e.stopPropagation();
     try {
-      setLoading(true); // Show loading while duplicating
+      setLoading(true);
       await resumeService.create({
         title: `${resume.title} (Copy)`,
         summary: resume.summary,
@@ -53,7 +81,6 @@ export default function Dashboard() {
         phone: resume.phone,
         linkedin: resume.linkedin,
       });
-      // Refetch everything to keep state perfectly in sync
       fetchResumes();
     } catch (err) {
       alert("Failed to duplicate");
@@ -71,23 +98,15 @@ export default function Dashboard() {
     }
   };
 
-  const handleLogout = async () => {  // ✅ CHANGED: Made async
-  try {
-    // ✅ ADDED: Call logout endpoint to clear cookie
-    await fetch("/api/auth/logout", {
-      method: "POST",
-      credentials: "include",  // Send cookie to be cleared
-    });
-    
-    logout();  // Clear AuthContext
-    navigate("/login");
-  } catch (err) {
-    console.error("Logout error:", err);
-    // Still navigate to login even if API fails
-    logout();
-    navigate("/login");
+  const handleLogout = async () => {
+    await logout();
+    navigate('/login');
+  };
+
+  // ✅ Don't render anything if no user (will redirect)
+  if (!user) {
+    return null;
   }
-};
 
   return (
     <div style={{ minHeight: "100vh", background: "linear-gradient(135deg, #f8fafc 0%, #eef2ff 50%, #f5f3ff 100%)", fontFamily: "'Inter', system-ui, sans-serif" }}>

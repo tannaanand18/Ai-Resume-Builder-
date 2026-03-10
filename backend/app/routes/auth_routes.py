@@ -52,12 +52,8 @@ def register():
 # -------------------------------
 @auth.route("/login", methods=["POST"])
 def login():
-    """
-    Login user and set JWT token in httpOnly cookie
-    """
     try:
         data = request.get_json()
-
         email = data.get("email")
         password = data.get("password")
 
@@ -72,17 +68,17 @@ def login():
         if not bcrypt.check_password_hash(user.password, password):
             return jsonify({"error": "Invalid credentials"}), 401
 
-        # Create JWT token with 7-day expiry
+        # Create JWT token
         access_token = create_access_token(
             identity=str(user.id),
             additional_claims={
                 "email": user.email,
                 "role": user.role
             },
-            expires_delta=timedelta(days=7)  # ✅ Token expires in 7 days
+            expires_delta=timedelta(days=7)
         )
 
-        # ✅ CREATE RESPONSE WITH COOKIE
+        # ✅ IMPORTANT: Use make_response to create response object
         response = make_response(jsonify({
             "message": "Login successful",
             "email": user.email,
@@ -90,22 +86,27 @@ def login():
             "user_id": user.id
         }), 200)
 
-        # ✅ SET HTTPONLY COOKIE (Secure & Auto-sent)
+        # ✅ CRITICAL: Set the cookie
         response.set_cookie(
-            key="access_token_cookie",      # Cookie name
-            value=access_token,             # JWT token
-            httponly=True,                  # 🔒 JavaScript can't access it (XSS protection)
-            secure=False,                   # Set True in production with HTTPS
-            samesite="Lax",                 # CSRF protection
-            max_age=7*24*60*60,            # 7 days in seconds
-            path="/"                        # Available for all routes
+            'access_token_cookie',          # Cookie name (must match JWT config)
+            value=access_token,              # JWT token value
+            max_age=7*24*60*60,             # 7 days in seconds
+            httponly=True,                   # Secure: JS can't access
+            secure=False,                    # False for HTTP (dev), True for HTTPS (prod)
+            samesite='Lax',                  # CSRF protection
+            path='/'                         # Available on all paths
         )
 
-        print(f"✅ Login successful for {email}, cookie set")
+        # ✅ DEBUG: Confirm cookie was set
+        print(f"✅ Login successful for {email}")
+        print(f"✅ Cookie 'access_token_cookie' set with value: {access_token[:50]}...")
+        
         return response
 
     except Exception as e:
         print(f"❌ Login error: {str(e)}")
+        import traceback
+        traceback.print_exc()
         return jsonify({"error": "Login failed"}), 500
     
 #########################Logout Route#########################
@@ -136,6 +137,60 @@ def logout():
     except Exception as e:
         print(f"❌ Logout error: {str(e)}")
         return jsonify({"error": "Logout failed"}), 500    
+
+
+################### Check Auth ####################
+@auth.route("/check-auth", methods=["GET"])
+@jwt_required()  # 🔒 This checks the cookie automatically!
+def check_auth():
+    """
+    Am I logged in? YES or NO
+    Like security guard checking your wristband
+    """
+    try:
+        user_id = get_jwt_identity()  # Read the wristband
+        
+        # If we got here, wristband is valid!
+        return jsonify({
+            "authenticated": True,  # ✅ YES, you're allowed!
+            "message": "You are logged in"
+        }), 200
+        
+    except:
+        # No wristband or expired wristband
+        return jsonify({
+            "authenticated": False  # ❌ NO, get a ticket!
+        }), 401
+
+################Get Current User Info#####################
+@auth.route("/me", methods=["GET"])
+@jwt_required()
+def get_current_user():
+    try:
+        user_id = get_jwt_identity()
+        print(f"✅ /me route - user_id from JWT: {user_id}")
+        
+        user = User.query.get(int(user_id))
+        
+        if not user:
+            print(f"❌ User {user_id} not found in database")
+            return jsonify({"error": "User not found"}), 404
+        
+        print(f"✅ Returning user: {user.email}")
+        
+        # ✅ FIXED: Only return fields that exist in your User model
+        return jsonify({
+            "id": user.id,
+            "email": user.email,
+            "role": user.role
+            # ❌ REMOVED: "full_name" - doesn't exist in your model
+        }), 200
+        
+    except Exception as e:
+        print(f"❌ /me error: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({"error": "Not logged in"}), 401      
 
 
 

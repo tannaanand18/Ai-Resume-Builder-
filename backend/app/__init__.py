@@ -23,11 +23,13 @@ def create_app():
     app.config.from_object(Config)
     
     # ✅ ADDED: JWT Cookie Configuration (5 lines)
+    app.config["JWT_SECRET_KEY"] = "jwtsecret"  
     app.config["JWT_TOKEN_LOCATION"] = ["cookies"]           # Look for JWT in cookies
     app.config["JWT_COOKIE_SECURE"] = False                  # Set True in production with HTTPS
     app.config["JWT_COOKIE_CSRF_PROTECT"] = False            # Disable CSRF for now (can enable later)
     app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(days=7)  # Token expires in 7 days
-    app.config["JWT_COOKIE_SAMESITE"] = "Lax"               # CSRF protection
+    app.config["JWT_COOKIE_SAMESITE"] = "Lax"   
+    app.config["JWT_ACCESS_COOKIE_NAME"] = "access_token_cookie"            # CSRF protection
 
     # Enable CORS for frontend (React running on port 5173 or 3000)
     # ✅ KEEP supports_credentials=True (already correct!)
