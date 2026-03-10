@@ -8,8 +8,7 @@ import {AuthProvider, useAuth } from "./context/AuthContext";
 import TemplateSelect from "./pages/TemplateSelect";
 import AdminPanel from "./pages/AdminPanel";
 import ForgotPassword from "./pages/ForgotPassword";
-import ResetPassword from "./pages/resetpassword";
-
+import ResetPassword from "./pages/ResetPassword";
 
 
 function PrivateRoute({ children }) {
