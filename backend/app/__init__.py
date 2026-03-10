@@ -33,6 +33,7 @@ def create_app():
     app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(days=7)
     app.config["JWT_COOKIE_SAMESITE"] = "None"
     app.config["JWT_ACCESS_COOKIE_NAME"] = "access_token_cookie"
+    app.config["JWT_COOKIE_DOMAIN"] = None
 
     # Enable CORS for frontend
     CORS(
