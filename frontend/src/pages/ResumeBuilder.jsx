@@ -2465,6 +2465,8 @@ export default function ResumeBuilder() {
     inner.style.width = savedWidth;
   };
   // Cookie-based auth: credentials "include" sends the httpOnly cookie automatically
+  const BASE = import.meta.env.VITE_API_URL || "";
+
   const headers = { "Content-Type": "application/json" };
   const fetchOpts = { headers, credentials: "include" };
 
@@ -2507,7 +2509,7 @@ export default function ResumeBuilder() {
  const fetchAll = async () => {
     try {
       // 1. Fetch Resume Basic Info
-      const resResume = await fetch(`/api/resume/${id}`, fetchOpts);
+      const resResume = await fetch(`${BASE}/api/resume/${id}`, fetchOpts);
       const data = await resResume.json();
       
       // Note: your backend returns { resume: {...}, message: "..." } 
@@ -2536,12 +2538,12 @@ export default function ResumeBuilder() {
 
       // 2. Fetch all related data in parallel
       const [resExp, resEdu, resSkills, resProj, resCerts] = await Promise.all([
-        fetch(`/api/experience/${id}`, fetchOpts),
-        fetch(`/api/education/${id}`, fetchOpts),
-        fetch(`/api/skills/${id}`, fetchOpts),
-        fetch(`/api/projects/${id}`, fetchOpts),
-        fetch(`/api/certifications/${id}`, fetchOpts)
-      ]);
+        fetch(`${BASE}/api/experience/${id}`, fetchOpts),
+        fetch(`${BASE}/api/education/${id}`, fetchOpts),
+        fetch(`${BASE}/api/skills/${id}`, fetchOpts),
+        fetch(`${BASE}/api/projects/${id}`, fetchOpts),
+        fetch(`${BASE}/api/certifications/${id}`, fetchOpts)
+        ]);
 
       // Convert all responses to JSON
       setExperiences(await resExp.json() || []);
@@ -2559,7 +2561,7 @@ export default function ResumeBuilder() {
   const saveResume = async () => {
     setSaving(true);
     try {
-      const res = await fetch(`/api/resume/${id}`, { method: "PUT", ...fetchOpts, body: JSON.stringify(resume) });
+      const res = await fetch(`${BASE}/api/resume/${id}`, { method: "PUT", ...fetchOpts, body: JSON.stringify(resume) });
       if (res.ok) showToast("✅ Resume saved successfully!");
       else showToast("❌ Failed to save");
     } catch { showToast("❌ Failed to save"); }
@@ -2826,10 +2828,10 @@ export default function ResumeBuilder() {
           showToast("❌ Please fill in Full Name and Professional Title first!");
           return;
         }
-        await fetch(`/api/resume/${id}`, { method: "PUT", ...fetchOpts, body: JSON.stringify(resume) });
-        showToast("✨ Generating summary...");
-        try {
-          const res = await fetch(`/api/ai/generate-summary/${id}`, fetchOpts);
+        await fetch(`${BASE}/api/resume/${id}`, { method: "PUT", ...fetchOpts, body: JSON.stringify(resume) });
+showToast("✨ Generating summary...");
+try {
+  const res = await fetch(`${BASE}/api/ai/generate-summary/${id}`, fetchOpts);
           const data = await res.json();
           if (data.ai_generated_summary) {
             setResume(prev => ({ ...prev, summary: data.ai_generated_summary }));
@@ -2884,9 +2886,9 @@ export default function ResumeBuilder() {
         }
         showToast("✨ Generating description...");
         try {
-          const res = await fetch("/api/ai/generate-experience", {
-            method: "POST",
-            ...fetchOpts,
+          const res = await fetch(`${BASE}/api/ai/generate-experience`, {
+  method: "POST",
+  ...fetchOpts,
             body: JSON.stringify({
               role: expForm.role,
               company: expForm.company,
@@ -3003,9 +3005,9 @@ export default function ResumeBuilder() {
         }
         showToast("✨ Generating description...");
         try {
-          const res = await fetch("/api/ai/generate-project", {
-            method: "POST",
-            ...fetchOpts,
+          const res = await fetch(`${BASE}/api/ai/generate-project`, {
+  method: "POST",
+  ...fetchOpts,
             body: JSON.stringify({
               title: projForm.title,
               tech_stack: projForm.tech_stack
