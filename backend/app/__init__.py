@@ -35,18 +35,16 @@ def create_app(test_config=None):
     # CORS: allow frontend origins with credentials
     frontend_url = os.getenv("FRONTEND_URL", "http://localhost:5173")
     CORS(
-    app,
-    supports_credentials=True,
-    origins=[
-        "http://localhost:5173",
-        "http://localhost:5174",
-        "http://localhost:5175",
-        "http://127.0.0.1:5173",
-        frontend_url,
-    ],
-    allow_headers=["Content-Type", "Authorization"],
-    methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"]
-)
+        app,
+        supports_credentials=True,
+        origins=[
+            "http://localhost:5173",
+            "http://localhost:5174",
+            "http://localhost:5175",
+            "http://127.0.0.1:5173",
+            frontend_url,
+        ]
+    )
 
     # Initialize Extensions
     jwt.init_app(app)
