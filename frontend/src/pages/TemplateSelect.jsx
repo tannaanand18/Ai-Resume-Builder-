@@ -1106,7 +1106,8 @@ export default function TemplateSelect() {
 
   const createWithTemplate = async (templateId, templateStyle) => {
     try {
-      const res = await fetch("/api/resume/", {
+      const BASE = import.meta.env.VITE_API_URL || "";
+const res = await fetch(`${BASE}/api/resume/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

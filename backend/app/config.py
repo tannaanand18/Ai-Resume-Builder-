@@ -14,7 +14,7 @@ class Config:
     GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 
     JWT_ACCESS_TOKEN_EXPIRES = timedelta(days=7)
-    JWT_COOKIE_SAMESITE = "Lax"
+    JWT_COOKIE_SAMESITE = "None"
     JWT_TOKEN_LOCATION = ["cookies"]
     JWT_ACCESS_COOKIE_NAME = "access_token_cookie"
     JWT_COOKIE_SECURE = is_prod
