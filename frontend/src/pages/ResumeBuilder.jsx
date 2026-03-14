@@ -2443,7 +2443,7 @@ export default function ResumeBuilder() {
     try {
       // Capture the full content at natural size
       const canvas = await html2canvas(inner, {
-        scale: 3, useCORS: true, scrollY: 0, backgroundColor: '#ffffff'
+        scale: 2, useCORS: true, scrollY: 0, backgroundColor: '#ffffff'
       });
       // Create single-page A4 PDF by fitting the image
       const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
@@ -2452,7 +2452,7 @@ export default function ResumeBuilder() {
       let w = A4W, h = A4W * ratio;
       if (h > A4H) { h = A4H; w = A4H / ratio; }
       const x = (A4W - w) / 2;
-      pdf.addImage(canvas.toDataURL('image/png'), 'PNG', x, 0, w, h);
+      pdf.addImage(canvas.toDataURL('image/jpeg', 1.0), 'JPEG', x, 0, w, h);
       pdf.save(`${resume.full_name || 'My'}_Resume.pdf`);
       showToast("\u2705 PDF downloaded!");
     } catch (err) {
