@@ -2443,7 +2443,7 @@ export default function ResumeBuilder() {
     try {
       // Capture the full content at natural size
       const canvas = await html2canvas(inner, {
-        scale: 2, useCORS: true, scrollY: 0, backgroundColor: '#ffffff'
+        scale: 3, useCORS: true, scrollY: 0, backgroundColor: '#ffffff'
       });
       // Create single-page A4 PDF by fitting the image
       const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
@@ -2452,7 +2452,7 @@ export default function ResumeBuilder() {
       let w = A4W, h = A4W * ratio;
       if (h > A4H) { h = A4H; w = A4H / ratio; }
       const x = (A4W - w) / 2;
-      pdf.addImage(canvas.toDataURL('image/jpeg', 1.0), 'JPEG', x, 0, w, h);
+      pdf.addImage(canvas.toDataURL('image/png'), 'PNG', x, 0, w, h);
       pdf.save(`${resume.full_name || 'My'}_Resume.pdf`);
       showToast("\u2705 PDF downloaded!");
     } catch (err) {
@@ -2779,7 +2779,7 @@ export default function ResumeBuilder() {
         </div>
       )}
 
-      <div style={{ display: "grid", gridTemplateColumns: "480px 1fr", height: "calc(100vh - 56px)" }}>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr", height: "calc(100vh - 56px)" }}>
         {/* LEFT */}
         <div style={{ overflowY: "auto", padding: "24px 22px", borderRight: "1px solid #e2e8f0", background: "#fff" }}>
           <div style={{ display: "flex", gap: 3, backgroundColor: "#f1f5f9", borderRadius: 10, padding: 3, marginBottom: 24 }}>
@@ -3066,7 +3066,7 @@ try {
         </div>
 
         {/* RIGHT — Live Preview */}
-        <div style={{ overflowY: "auto", background: "linear-gradient(180deg, #e2e8f0 0%, #cbd5e1 100%)", padding: "24px 0", display: "flex", justifyContent: "center" }}>
+        <div style={{ overflowY: "auto", background: "linear-gradient(180deg, #e2e8f0 0%, #cbd5e1 100%)", padding: "24px 0", display: "flex", justifyContent: "center", "@media(maxWidth:768px)": {display: "none"} }}>
           
           {/* ✅ The A4 Canvas Wrapper */}
           <div 
