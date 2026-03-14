@@ -105,13 +105,13 @@ export default function AdminPanel() {
   // ─── STYLES ───
   const s = {
     page: { minHeight: "100vh", background: "linear-gradient(135deg, #f8fafc 0%, #eef2ff 50%, #f5f3ff 100%)", fontFamily: "'Inter', system-ui, sans-serif" },
-    header: { background: "linear-gradient(135deg, #0f172a, #1e293b)", color: "#fff", padding: "0 32px", height: 56, display: "flex", alignItems: "center", justifyContent: "space-between", position: "sticky", top: 0, zIndex: 50 },
+    header: { background: "linear-gradient(135deg, #0f172a, #1e293b)", color: "#fff", padding: "0 16px", height: 56, display: "flex", alignItems: "center", justifyContent: "space-between", position: "sticky", top: 0, zIndex: 50 },
     headerTitle: { fontSize: 18, fontWeight: 800, display: "flex", alignItems: "center", gap: 8 },
     headerRight: { display: "flex", alignItems: "center", gap: 16, fontSize: 13 },
-    body: { maxWidth: 1200, margin: "0 auto", padding: "24px 20px" },
+    body: { maxWidth: 1200, margin: "0 auto", padding: "24px 12px" },
     tabs: { display: "flex", gap: 4, background: "#e2e8f0", borderRadius: 10, padding: 4, marginBottom: 24, width: "fit-content" },
     tab: (active) => ({ padding: "8px 20px", borderRadius: 8, border: "none", fontSize: 13, fontWeight: 600, cursor: "pointer", background: active ? "#fff" : "transparent", color: active ? "#4f46e5" : "#64748b", boxShadow: active ? "0 1px 4px rgba(99,102,241,0.12)" : "none", transition: "all 0.2s ease" }),
-    statGrid: { display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 20, marginBottom: 32 },
+    statGrid: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 20, marginBottom: 32 },
     statCard: (color) => ({ background: "#fff", borderRadius: 14, padding: "24px 28px", boxShadow: "0 1px 4px rgba(0,0,0,0.04)", borderLeft: `4px solid ${color}` }),
     statNum: { fontSize: 32, fontWeight: 800, color: "#0f172a", margin: 0 },
     statLabel: { fontSize: 13, color: "#64748b", marginTop: 4 },
@@ -119,7 +119,7 @@ export default function AdminPanel() {
     cardHeader: { padding: "16px 20px", borderBottom: "1px solid #f1f5f9", display: "flex", justifyContent: "space-between", alignItems: "center" },
     cardTitle: { fontSize: 15, fontWeight: 700, color: "#0f172a" },
     searchInput: { border: "2px solid #e2e8f0", borderRadius: 10, padding: "8px 14px", fontSize: 13, outline: "none", width: 260, background: "#f8fafc", transition: "all 0.2s ease" },
-    table: { width: "100%", borderCollapse: "collapse" },
+    table: { width: "100%", borderCollapse: "collapse", display: "block", overflowX: "auto", WebkitOverflowScrolling: "touch" },
     th: { padding: "12px 16px", textAlign: "left", fontSize: 11, fontWeight: 700, color: "#64748b", textTransform: "uppercase", letterSpacing: "0.05em", borderBottom: "1px solid #f1f5f9", background: "#fafbfc" },
     td: { padding: "12px 16px", fontSize: 13, color: "#334155", borderBottom: "1px solid #f8fafc" },
     badge: (role) => ({ display: "inline-block", padding: "3px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700, background: role === "admin" ? "#eef2ff" : "#ecfdf5", color: role === "admin" ? "#6366f1" : "#059669" }),
@@ -129,7 +129,7 @@ export default function AdminPanel() {
     empty: { padding: 40, textAlign: "center", color: "#94a3b8", fontSize: 14 },
     toast: (ok) => ({ position: "fixed", top: 70, right: 24, zIndex: 999, background: ok ? "linear-gradient(135deg, #059669, #10b981)" : "linear-gradient(135deg, #dc2626, #ef4444)", color: "#fff", padding: "12px 24px", borderRadius: 12, fontSize: 14, fontWeight: 600, boxShadow: "0 8px 24px rgba(0,0,0,0.15)", backdropFilter: "blur(8px)" }),
     overlay: { position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", backdropFilter: "blur(4px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 100 },
-    modal: { background: "#fff", borderRadius: 20, padding: 32, width: 420, boxShadow: "0 24px 60px rgba(0,0,0,0.2)" },
+    modal: { background: "#fff", borderRadius: 20, padding: 32, width: "min(420px, 95vw)", boxShadow: "0 24px 60px rgba(0,0,0,0.2)" },
   };
 
   if (loading) {
@@ -212,7 +212,7 @@ export default function AdminPanel() {
             </div>
 
             {/* Recent Users & Resumes side by side */}
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 20 }}>
               <div style={s.card}>
                 <div style={s.cardHeader}><span style={s.cardTitle}>Recent Users</span></div>
                 <table style={s.table}>
@@ -318,7 +318,7 @@ export default function AdminPanel() {
                   </div>
                 </div>
 
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 16, marginBottom: 20 }}>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 16, marginBottom: 20 }}>
                   <div style={{ background: "#f8fafc", borderRadius: 10, padding: 16 }}>
                     <p style={{ margin: 0, fontSize: 12, color: "#64748b" }}>User ID</p>
                     <p style={{ margin: "4px 0 0", fontWeight: 700, fontSize: 16 }}>{selectedUser.id}</p>
