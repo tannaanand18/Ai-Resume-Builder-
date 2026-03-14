@@ -2633,7 +2633,7 @@ export default function ResumeBuilder() {
           .rb-header-right { flex-wrap: wrap !important; gap: 6px !important; }
           .rb-header-right button { font-size: 11px !important; padding: 6px 10px !important; }
           .rb-preview-wrapper { width: 100% !important; overflow-x: auto !important; }
-          .rb-a4 { transform: scale(0.45) !important; transform-origin: top left !important; margin-bottom: -160mm !important; }
+          
         }
       `}</style>
 
@@ -3079,7 +3079,7 @@ try {
           
           {/* ✅ The A4 Canvas Wrapper */}
           <div 
-            ref={componentRef} className="rb-a4" 
+            ref={componentRef} 
             style={{ 
               background: "#fff", 
               width: "210mm",
