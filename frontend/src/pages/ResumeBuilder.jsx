@@ -2865,7 +2865,7 @@ try {
                     </div>
                     <div style={{ display: "flex", gap: 4 }}>
                       <button style={editBtn} onClick={() => setEditingItem({ type: "experience", index: i, data: { ...exp } })}>✏️ Edit</button>
-                      <button style={delBtn} onClick={() => deleteItem(`/api/experience/${exp.id}`, "experience", i)}>🗑️</button>
+                      <button style={delBtn} onClick={() => deleteItem(`${BASE}/api/experience/${exp.id}`, "experience", i)}>🗑️</button>
                     </div>
                   </div>
                 ))}
@@ -2916,7 +2916,7 @@ try {
     value={expForm.description}
     onChange={e => setExpForm({ ...expForm, description: e.target.value })} />
 </div>
-                <button style={{ ...btn, fontFamily: "inherit", marginTop: 8 }} onClick={() => addItem(`/api/experience/`, { ...expForm, resume_id: parseInt(id) }, () => setExpForm({ company: "", role: "", start_date: "", end_date: "", description: "" }), "experience")}>+ Add Experience</button>
+                <button style={{ ...btn, fontFamily: "inherit", marginTop: 8 }} onClick={() => addItem(`${BASE}/api/experience/`, { ...expForm, resume_id: parseInt(id) }, () => setExpForm({ company: "", role: "", start_date: "", end_date: "", description: "" }), "experience")}>+ Add Experience</button>
               </div>
             )}
 
@@ -2932,7 +2932,7 @@ try {
                     </div>
                     <div style={{ display: "flex", gap: 4 }}>
                       <button style={editBtn} onClick={() => setEditingItem({ type: "education", index: i, data: { ...edu } })}>✏️ Edit</button>
-                      <button style={delBtn} onClick={() => deleteItem(`/api/education/${edu.id}`, "education", i)}>🗑️</button>
+                      <button style={delBtn} onClick={() => deleteItem(`${BASE}/api/education/${edu.id}`, "education", i)}>🗑️</button>
                     </div>
                   </div>
                 ))}
@@ -2942,7 +2942,7 @@ try {
                     <div key={key}><label style={lbl}>{label}</label><input className="rb-inp" style={inp} placeholder={ph} value={eduForm[key]} onChange={e => setEduForm({ ...eduForm, [key]: e.target.value })} /></div>
                   ))}
                 </div>
-                <button style={{ ...btn, fontFamily: "inherit", marginTop: 8 }} onClick={() => addItem(`/api/education/`, { ...eduForm, resume_id: parseInt(id) }, () => setEduForm({ degree: "", institution: "", start_year: "", end_year: "", gpa: "" }), "education")}>+ Add Education</button>
+                <button style={{ ...btn, fontFamily: "inherit", marginTop: 8 }} onClick={() => addItem(`${BASE}/api/education/`, { ...eduForm, resume_id: parseInt(id) }, () => setEduForm({ degree: "", institution: "", start_year: "", end_year: "", gpa: "" }), "education")}>+ Add Education</button>
               </div>
             )}
 
@@ -2955,7 +2955,7 @@ try {
                     <span key={i} style={{ background: "linear-gradient(135deg, #eef2ff, #f5f3ff)", color: "#4f46e5", border: "1.5px solid #c7d2fe", borderRadius: 20, padding: "5px 12px", fontSize: 12.5, display: "flex", alignItems: "center", gap: 6, fontWeight: 500 }}>
                       {s.name} <span style={{ fontSize: 10, color: "#818cf8", fontWeight: 600 }}>· {s.level}</span>
                       <button onClick={() => setEditingItem({ type: "skills", index: i, data: { ...s } })} style={{ ...editBtn, fontSize: 10, padding: 0 }}>✏️</button>
-                      <button onClick={() => deleteItem(`/api/skills/${s.id}`, "skills", i)} style={{ ...delBtn, fontSize: 10, padding: 0 }}>✕</button>
+                      <button onClick={() => deleteItem(`${BASE}/api/skills/${s.id}`, "skills", i)} style={{ ...delBtn, fontSize: 10, padding: 0 }}>✕</button>
                     </span>
                   ))}
                 </div>
@@ -2967,7 +2967,7 @@ try {
                       {["Beginner", "Intermediate", "Advanced", "Expert"].map(l => <option key={l}>{l}</option>)}
                     </select>
                   </div>
-                  <button style={{ ...btn, fontFamily: "inherit" }} onClick={() => addItem(`/api/skills/`, { ...skillForm, resume_id: parseInt(id) }, () => setSkillForm({ name: "", level: "Intermediate" }), "skills")}>+ Add</button>
+                  <button style={{ ...btn, fontFamily: "inherit" }} onClick={() => addItem(`${BASE}/api/skills/`, { ...skillForm, resume_id: parseInt(id) }, () => setSkillForm({ name: "", level: "Intermediate" }), "skills")}>+ Add</button>
                 </div>
               </div>
             )}
@@ -2984,7 +2984,7 @@ try {
                     </div>
                     <div style={{ display: "flex", gap: 4 }}>
                       <button style={editBtn} onClick={() => setEditingItem({ type: "projects", index: i, data: { ...p } })}>✏️ Edit</button>
-                      <button style={delBtn} onClick={() => deleteItem(`/api/projects/${p.id}`, "projects", i)}>🗑️</button>
+                      <button style={delBtn} onClick={() => deleteItem(`${BASE}/api/projects/${p.id}`, "projects", i)}>🗑️</button>
                     </div>
                   </div>
                 ))}
@@ -3033,7 +3033,7 @@ try {
     value={projForm.description}
     onChange={e => setProjForm({ ...projForm, description: e.target.value })} />
 </div>
-                <button style={{ ...btn, fontFamily: "inherit", marginTop: 8 }} onClick={() => addItem(`/api/projects/`, { ...projForm, resume_id: parseInt(id) }, () => setProjForm({ title: "", description: "", tech_stack: "", link: "" }), "projects")}>+ Add Project</button>
+                <button style={{ ...btn, fontFamily: "inherit", marginTop: 8 }} onClick={() => addItem(`${BASE}/api/projects/`, { ...projForm, resume_id: parseInt(id) }, () => setProjForm({ title: "", description: "", tech_stack: "", link: "" }), "projects")}>+ Add Project</button>
               </div>
             )}
 
@@ -3049,7 +3049,7 @@ try {
                     </div>
                     <div style={{ display: "flex", gap: 4 }}>
                       <button style={editBtn} onClick={() => setEditingItem({ type: "certs", index: i, data: { ...c } })}>✏️ Edit</button>
-                      <button style={delBtn} onClick={() => deleteItem(`/api/certifications/${c.id}`, "certs", i)}>🗑️</button>
+                      <button style={delBtn} onClick={() => deleteItem(`${BASE}/api/certifications/${c.id}`, "certs", i)}>🗑️</button>
                     </div>
                   </div>
                 ))}
@@ -3059,7 +3059,7 @@ try {
                     <div key={key}><label style={lbl}>{label}</label><input className="rb-inp" style={inp} placeholder={ph} value={certForm[key]} onChange={e => setCertForm({ ...certForm, [key]: e.target.value })} /></div>
                   ))}
                 </div>
-                <button style={{ ...btn, fontFamily: "inherit", marginTop: 8 }} onClick={() => addItem(`/api/certifications/`, { ...certForm, resume_id: parseInt(id) }, () => setCertForm({ name: "", issuer: "", issue_date: "", expiry_date: "" }), "certs")}>+ Add Certification</button>
+                <button style={{ ...btn, fontFamily: "inherit", marginTop: 8 }} onClick={() => addItem(`${BASE}/api/certifications/`, { ...certForm, resume_id: parseInt(id) }, () => setCertForm({ name: "", issuer: "", issue_date: "", expiry_date: "" }), "certs")}>+ Add Certification</button>
               </div>
             )}
           </div>
