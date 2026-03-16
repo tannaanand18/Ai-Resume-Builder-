@@ -1,6 +1,40 @@
-return (
-  <AuthContext.Provider value={{ user, login, logout, loading, checkAuth }}>
-    {loading ? (
+import { createContext, useContext, useState, useEffect } from 'react';
+import api from '../services/api';
+
+const AuthContext = createContext();
+
+export const AuthProvider = ({ children }) => {
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    checkAuth();
+  }, []);
+
+  const checkAuth = async () => {
+    try {
+      const res = await api.get('/auth/me');
+      setUser(res.data);
+    } catch (err) {
+      setUser(null);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const login = (userData) => setUser(userData);
+
+  const logout = async () => {
+    try {
+      await api.post('/auth/logout');
+    } catch (err) {
+      console.error('Logout error:', err);
+    }
+    setUser(null);
+  };
+
+  if (loading) {
+    return (
       <div style={{
         minHeight: "100vh",
         display: "flex",
@@ -26,7 +60,7 @@ return (
               stroke="white" strokeWidth="2.5" strokeLinecap="round"/>
           </svg>
         </div>
-        <div style={{ fontSize: 20, fontWeight: 800, color: "#0f172a", marginBottom: 8 }}>
+        <div style={{ fontSize: 20, fontWeight: 800, color: "#0f172a", marginBottom: 16 }}>
           Resume<span style={{ color: "#6366f1" }}>AI</span>
         </div>
         <div style={{
@@ -41,6 +75,20 @@ return (
           Starting server, please wait...
         </p>
       </div>
-    ) : children}
-  </AuthContext.Provider>
-);
+    );
+  }
+
+  return (
+    <AuthContext.Provider value={{ user, login, logout, loading, checkAuth }}>
+      {children}
+    </AuthContext.Provider>
+  );
+};
+
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth must be used within AuthProvider');
+  }
+  return context;
+};
