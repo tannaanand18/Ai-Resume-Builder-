@@ -2443,7 +2443,7 @@ export default function ResumeBuilder() {
     try {
       // Capture the full content at natural size
       const canvas = await html2canvas(inner, {
-        scale: 2, useCORS: true, scrollY: 0, backgroundColor: '#ffffff'
+        scale: 3, useCORS: true, scrollY: 0, backgroundColor: '#ffffff'
       });
       // Create single-page A4 PDF by fitting the image
       const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
