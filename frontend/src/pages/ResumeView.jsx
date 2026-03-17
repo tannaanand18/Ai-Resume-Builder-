@@ -12,8 +12,6 @@ export default function ResumeView() {
   const [error, setError] = useState(null);
   const [showShareMenu, setShowShareMenu] = useState(false);
   const [copyDone, setCopyDone] = useState(false);
-  const [downloading, setDownloading] = useState(false);
-
   const publicUrl = `${window.location.origin}/resume/${id}/view`;
 
   useEffect(() => {
@@ -47,29 +45,9 @@ export default function ResumeView() {
     setShowShareMenu(false);
   };
 
-  const handleDownloadPDF = async () => {
-    setDownloading(true);
+  const handleDownloadPDF = () => {
     setShowShareMenu(false);
-    try {
-      const name = data?.resume?.full_name || "resume";
-      const filename = `${name.replace(/\s+/g, "_")}_Resume.pdf`;
-      const template = data?.resume?.template_style || data?.resume?.template_name || "simplyblue_modern";
-      const res = await fetch(`${BASE}/api/resume/public-pdf/${id}?template=${template}`);
-      if (res.ok) {
-        const blob = await res.blob();
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = filename;
-        a.click();
-        URL.revokeObjectURL(url);
-      } else {
-        window.print();
-      }
-    } catch {
-      window.print();
-    }
-    setDownloading(false);
+    window.print();
   };
 
   if (loading) return (
@@ -101,7 +79,13 @@ export default function ResumeView() {
         @keyframes fadeIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
         .share-opt:hover { background: #f1f5f9 !important; }
         @media (max-width: 600px) { .btn-label { display: none; } }
-        @media print { .no-print { display: none !important; } body { background: white !important; } }
+        @media print {
+          .no-print { display: none !important; }
+          * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; color-adjust: exact !important; }
+          body { margin: 0 !important; padding: 0 !important; background: white !important; }
+          html, body { height: auto !important; }
+          @page { margin: 0; size: A4; }
+        }
       `}</style>
 
       {/* Top Bar */}
@@ -160,19 +144,18 @@ export default function ResumeView() {
 
                 <div className="share-opt" onClick={handleDownloadPDF} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px 12px", cursor: "pointer" }}>
                   <div style={{ width: 32, height: 32, borderRadius: 8, background: "#f0fdf4", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                    {downloading ? <div style={{ width: 14, height: 14, border: "2px solid #dcfce7", borderTopColor: "#059669", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
-                    : <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" stroke="#059669" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>}
+                    <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" stroke="#059669" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
                   </div>
-                  <div><div style={{ fontSize: 13, fontWeight: 600, color: "#0f172a" }}>{downloading ? "Downloading..." : "Save as PDF"}</div><div style={{ fontSize: 11, color: "#94a3b8" }}>Download PDF file</div></div>
+                  <div><div style={{ fontSize: 13, fontWeight: 600, color: "#0f172a" }}>Save as PDF</div><div style={{ fontSize: 11, color: "#94a3b8" }}>Print exact resume to PDF</div></div>
                 </div>
               </div>
             )}
           </div>
 
-          <button onClick={handleDownloadPDF} disabled={downloading} style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 16px", background: "#059669", color: "#fff", border: "none", borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: "pointer", opacity: downloading ? 0.7 : 1 }}>
-            {downloading ? <div style={{ width: 14, height: 14, border: "2px solid rgba(255,255,255,0.3)", borderTopColor: "#fff", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
-            : <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>}
-            <span className="btn-label">{downloading ? " Downloading..." : " Save PDF"}</span>
+          <button onClick={handleDownloadPDF} style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 16px", background: "#059669", color: "#fff", border: "none", borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: "pointer" }}>
+            <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+            <span className="btn-label"> Save PDF</span>
           </button>
 
           <button onClick={() => navigate("/")} style={{ padding: "8px 16px", background: "transparent", border: "1px solid #e2e8f0", color: "#64748b", borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: "pointer" }}>
