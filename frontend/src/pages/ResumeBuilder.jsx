@@ -2536,6 +2536,7 @@ export default function ResumeBuilder() {
   
   const [templateStyle, setTemplateStyle] = useState("classic");
   const [showTemplateDropdown, setShowTemplateDropdown] = useState(false);
+  const [mobileView, setMobileView] = useState("edit"); // "edit" or "preview"
   const [showShare, setShowShare] = useState(false);
   const [experiences, setExperiences] = useState([]);
   const [expForm, setExpForm] = useState({ company: "", role: "", start_date: "", end_date: "", description: "" });
@@ -2664,6 +2665,31 @@ export default function ResumeBuilder() {
   const inp = { width: "100%", border: "1.5px solid #e2e8f0", borderRadius: 12, padding: "11px 14px", fontSize: 13.5, outline: "none", background: "#f8fafc", boxSizing: "border-box", transition: "all 0.2s ease", fontFamily: "inherit", color: "#1e293b" };
   const lbl = { display: "block", fontSize: 12, fontWeight: 600, color: "#475569", marginBottom: 6, letterSpacing: "0.01em" };
   const fld = { marginBottom: 20 };
+  // Inject responsive styles
+  if (typeof document !== "undefined" && !document.getElementById("rb-responsive-styles")) {
+    const styleEl = document.createElement("style");
+    styleEl.id = "rb-responsive-styles";
+    styleEl.textContent = `
+      .rb-mobile-toggle {
+        display: none;
+        gap: 4px;
+        padding: 8px 16px;
+        background: #fff;
+        border-bottom: 1px solid #e2e8f0;
+      }
+      @media (max-width: 768px) {
+        .rb-mobile-toggle { display: flex !important; }
+        .rb-main-grid { grid-template-columns: 1fr !important; height: auto !important; }
+        .rb-panel-hidden { display: none !important; }
+        .rb-panel-left { display: block !important; height: calc(100vh - 112px); overflow-y: auto; }
+        .rb-panel-right { display: block !important; min-height: calc(100vh - 112px); padding: 16px !important; }
+        .rb-inp { font-size: 16px !important; }
+        .rb-tab { padding: 6px 8px !important; font-size: 11px !important; }
+      }
+    `;
+    document.head.appendChild(styleEl);
+  }
+
   const btn = { background: "linear-gradient(135deg, #6366f1, #8b5cf6)", color: "#fff", border: "none", borderRadius: 10, padding: "10px 20px", fontSize: 13.5, fontWeight: 600, cursor: "pointer", transition: "all 0.2s ease", boxShadow: "0 2px 8px rgba(99,102,241,0.25)" };
   const card = { background: "#fff", border: "1.5px solid #e2e8f0", borderRadius: 12, padding: "16px 18px", marginBottom: 14, display: "flex", justifyContent: "space-between", alignItems: "flex-start", transition: "all 0.2s ease", boxShadow: "0 1px 3px rgba(0,0,0,0.04)" };
   const delBtn = { background: "none", border: "none", color: "#ef4444", cursor: "pointer", fontSize: 12, fontWeight: 600, padding: "4px 8px", borderRadius: 6, transition: "all 0.15s ease" };
@@ -2842,9 +2868,33 @@ export default function ResumeBuilder() {
         </div>
       )}
 
-      <div style={{ display: "grid", gridTemplateColumns: "480px 1fr", height: "calc(100vh - 56px)" }}>
-        {/* LEFT */}
-        <div style={{ overflowY: "auto", padding: "24px 22px", borderRight: "1px solid #e2e8f0", background: "#fff" }}>
+      {/* Mobile toggle bar - only shows on small screens */}
+      <div className="rb-mobile-toggle">
+        <button
+          onClick={() => setMobileView("edit")}
+          style={{
+            flex: 1, padding: "10px", border: "none", borderRadius: 8,
+            background: mobileView === "edit" ? "linear-gradient(135deg, #6366f1, #8b5cf6)" : "transparent",
+            color: mobileView === "edit" ? "#fff" : "#64748b",
+            fontWeight: 700, fontSize: 13, cursor: "pointer", transition: "all 0.2s"
+          }}>
+          ✏️ Edit
+        </button>
+        <button
+          onClick={() => setMobileView("preview")}
+          style={{
+            flex: 1, padding: "10px", border: "none", borderRadius: 8,
+            background: mobileView === "preview" ? "linear-gradient(135deg, #6366f1, #8b5cf6)" : "transparent",
+            color: mobileView === "preview" ? "#fff" : "#64748b",
+            fontWeight: 700, fontSize: 13, cursor: "pointer", transition: "all 0.2s"
+          }}>
+          👁️ Preview
+        </button>
+      </div>
+
+      <div className="rb-main-grid" style={{ display: "grid", gridTemplateColumns: "480px 1fr", height: "calc(100vh - 56px)" }}>
+        {/* LEFT - hide on mobile when previewing */}
+        <div className={mobileView === "preview" ? "rb-panel-hidden" : "rb-panel-left"} style={{ overflowY: "auto", padding: "24px 22px", borderRight: "1px solid #e2e8f0", background: "#fff" }}>
           <div style={{ display: "flex", gap: 3, backgroundColor: "#f1f5f9", borderRadius: 10, padding: 3, marginBottom: 24 }}>
             {TABS.map((tab, i) => (
               <button key={tab} onClick={() => setActiveTab(i)} className="rb-tab"
