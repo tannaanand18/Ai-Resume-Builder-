@@ -2544,40 +2544,46 @@ export default function ResumeBuilder() {
       const canvas = document.querySelector(".rb-preview-canvas");
       if (!canvas) return;
       if (window.innerWidth <= 768) {
-        const A4_WIDTH_PX = 794;
-        const A4_HEIGHT_PX = 1123;
-        const screenW = window.innerWidth;
-        const scale = screenW / A4_WIDTH_PX;
-        const scaledHeight = A4_HEIGHT_PX * scale;
-        // Reset inline size first
-        canvas.style.width = `${A4_WIDTH_PX}px`;
-        canvas.style.height = `${A4_HEIGHT_PX}px`;
-        canvas.style.transform = `scale(${scale})`;
-        canvas.style.transformOrigin = "top center";
-        canvas.style.display = "block";
-        canvas.style.marginLeft = "auto";
-        canvas.style.marginRight = "auto";
+        const A4_W = 794;
+        const A4_H = 1123;
+        const sw = window.innerWidth;
+        const scale = sw / A4_W;
+        const scaledH = A4_H * scale;
+        // Set fixed A4 size
+        canvas.style.width = A4_W + "px";
+        canvas.style.height = A4_H + "px";
+        canvas.style.minHeight = "unset";
+        canvas.style.overflow = "hidden";
+        // Key: use translateX to center after scale
+        // When scale < 1, canvas shrinks but still at left edge
+        // We need to shift it left by half the lost width
+        const lostW = A4_W - (A4_W * scale);
+        canvas.style.transform = `translateX(-${lostW / 2}px) scale(${scale})`;
+        canvas.style.transformOrigin = "top left";
         canvas.style.marginTop = "0";
-        canvas.style.marginBottom = `${-(A4_HEIGHT_PX - scaledHeight)}px`;
-        // Wrap parent to correct height
-        const parent = canvas.parentElement;
-        if (parent) {
-          parent.style.height = `${scaledHeight + 24}px`;
-          parent.style.overflow = "hidden";
-          parent.style.width = "100%";
+        canvas.style.marginBottom = `-${A4_H - scaledH}px`;
+        canvas.style.display = "block";
+        // Set wrapper height
+        const wrapper = canvas.parentElement;
+        if (wrapper) {
+          wrapper.style.height = scaledH + "px";
+          wrapper.style.overflow = "hidden";
+          wrapper.style.width = "100%";
+          wrapper.style.position = "relative";
         }
       } else {
         canvas.style.transform = "none";
         canvas.style.transformOrigin = "top center";
         canvas.style.width = "210mm";
         canvas.style.height = "297mm";
+        canvas.style.minHeight = "";
         canvas.style.marginBottom = "0";
-        canvas.style.marginLeft = "";
-        canvas.style.marginRight = "";
-        const parent = canvas.parentElement;
-        if (parent) {
-          parent.style.height = "";
-          parent.style.overflow = "";
+        canvas.style.overflow = "hidden";
+        const wrapper = canvas.parentElement;
+        if (wrapper) {
+          wrapper.style.height = "";
+          wrapper.style.overflow = "";
+          wrapper.style.width = "";
         }
       }
     };
