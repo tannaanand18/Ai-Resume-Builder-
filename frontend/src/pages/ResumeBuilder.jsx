@@ -2384,7 +2384,7 @@ const TEMPLATE_MAP = {
   blue_accent: TemplateBlueAccent
 };
 
-function ResumePreview({ resume, experiences, educations, skills, projects, certs, templateStyle }) {
+export function ResumePreview({ resume, experiences, educations, skills, projects, certs, templateStyle }) {
   // 1. Get the style passed from state, fallback to template_name, fallback to corporate
   const activeKey = templateStyle || resume.template_name || "corporate";
   
