@@ -2614,7 +2614,8 @@ export default function ResumeBuilder() {
   const saveResume = async () => {
     setSaving(true);
     try {
-      const res = await fetch(`${BASE}/api/resume/${id}`, { method: "PUT", ...fetchOpts, body: JSON.stringify(resume) });
+      const payload = { ...resume, template_style: templateStyle, template_name: resume.template_name || "simple" };
+      const res = await fetch(`${BASE}/api/resume/${id}`, { method: "PUT", ...fetchOpts, body: JSON.stringify(payload) });
       if (res.ok) showToast("✅ Resume saved successfully!");
       else showToast("❌ Failed to save");
     } catch { showToast("❌ Failed to save"); }
@@ -2890,7 +2891,7 @@ export default function ResumeBuilder() {
           showToast("❌ Please fill in Full Name and Professional Title first!");
           return;
         }
-        await fetch(`${BASE}/api/resume/${id}`, { method: "PUT", ...fetchOpts, body: JSON.stringify(resume) });
+        await fetch(`${BASE}/api/resume/${id}`, { method: "PUT", ...fetchOpts, body: JSON.stringify({ ...resume, template_style: templateStyle }) });
 showToast("✨ Generating summary...");
 try {
   const res = await fetch(`${BASE}/api/ai/generate-summary/${id}`, fetchOpts);

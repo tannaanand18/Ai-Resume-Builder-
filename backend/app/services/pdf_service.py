@@ -354,16 +354,56 @@ def pdf_creative(data, buffer):
 # ═══════════════════════════════════════════
 # DISPATCH
 # ═══════════════════════════════════════════
+# Map template_style values to PDF renderers
+STYLE_TO_PDF = {
+    # Modern/sidebar templates
+    "modern": "modern",
+    "sidebar": "modern",
+    "meghana": "modern",
+    "atlantic": "modern",
+    "atlantic_blue": "modern",
+    "quiet_blue": "modern",
+    "slate_dawn": "modern",
+    # Creative/colorful templates  
+    "creative": "creative",
+    "obsidian": "creative",
+    "black_pattern": "creative",
+    "hunter_green": "creative",
+    "rosewood": "creative",
+    "blue_accent": "creative",
+    "green_accent": "creative",
+    # Simple/classic templates (all others)
+    "simple": "simple",
+    "classic": "simple",
+    "corporate": "simple",
+    "harvard": "simple",
+    "minimal": "simple",
+    "annafield": "simple",
+    "finance": "simple",
+    "banking": "simple",
+    "silver": "simple",
+    "mercury": "simple",
+    "simplyblue": "simple",
+    "simplyblue_modern": "simple",
+}
+
+
 def generate_resume_pdf(resume_id):
     data   = fetch(resume_id)
-    tmpl   = (data["resume"].template_name or "simple").lower()
+    resume = data["resume"]
     buffer = BytesIO()
 
-    if tmpl == "modern":
+    # Use template_style first (more specific), fallback to template_name
+    style_key = (resume.template_style or resume.template_name or "simple").lower()
+    pdf_type  = STYLE_TO_PDF.get(style_key, "simple")
+
+    print(f"PDF: style_key={style_key} -> pdf_type={pdf_type}")
+
+    if pdf_type == "modern":
         pdf_modern(data, buffer)
-    elif tmpl == "creative":
+    elif pdf_type == "creative":
         pdf_creative(data, buffer)
-    else:  # simple + fallback
+    else:
         pdf_simple(data, buffer)
 
     buffer.seek(0)
