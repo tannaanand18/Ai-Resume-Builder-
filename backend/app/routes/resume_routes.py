@@ -329,3 +329,42 @@ def download_resume(resume_id):
     except Exception as e:
         print(f"❌ Error generating PDF: {str(e)}")
         return jsonify({"error": f"Failed to generate PDF: {str(e)}"}), 500
+
+@resume_bp.route("/public/<int:resume_id>", methods=["GET"])
+def get_public_resume(resume_id):
+    """Public route - no login required to view resume"""
+    try:
+        resume = Resume.query.filter_by(id=resume_id).first()
+        if not resume:
+            return jsonify({"error": "Resume not found"}), 404
+
+        experiences = Experience.query.filter_by(resume_id=resume_id).all()
+        educations = Education.query.filter_by(resume_id=resume_id).all()
+        skills = Skill.query.filter_by(resume_id=resume_id).all()
+        projects = Project.query.filter_by(resume_id=resume_id).all()
+        certs = Certification.query.filter_by(resume_id=resume_id).all()
+
+        return jsonify({
+            "resume": {
+                "id": resume.id,
+                "title": resume.title,
+                "full_name": resume.full_name,
+                "professional_title": resume.professional_title,
+                "email": resume.email,
+                "phone": resume.phone,
+                "location": resume.location,
+                "linkedin": resume.linkedin,
+                "website": resume.website,
+                "summary": resume.summary,
+                "template_name": resume.template_name,
+                "template_style": resume.template_style,
+            },
+            "experiences": [{"id": e.id, "company": e.company, "role": e.role, "start_date": str(e.start_date) if e.start_date else "", "end_date": str(e.end_date) if e.end_date else "", "description": e.description} for e in experiences],
+            "educations": [{"id": e.id, "degree": e.degree, "institution": e.institution, "start_year": e.start_year, "end_year": e.end_year, "score": e.score} for e in educations],
+            "skills": [{"id": s.id, "name": s.skill_name, "level": s.level} for s in skills],
+            "projects": [{"id": p.id, "title": p.project_title, "description": p.description, "tech_stack": p.tech_stack, "link": p.link} for p in projects],
+            "certs": [{"id": c.id, "name": c.title, "issuer": c.organization, "issue_date": c.issue_year} for c in certs],
+        }), 200
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500

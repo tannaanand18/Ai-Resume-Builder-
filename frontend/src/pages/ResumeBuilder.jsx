@@ -2404,6 +2404,58 @@ function ResumePreview({ resume, experiences, educations, skills, projects, cert
 }
 
 // ── MAIN BUILDER ──
+
+const BASE_SHARE = import.meta.env.VITE_API_URL || "";
+
+function SharePopupBuilder({ resume, onClose }) {
+  const resumeUrl = "https://resumebuilder-kappa-nine.vercel.app/resume/" + resume.id + "/view";
+  const name = resume.full_name || resume.title || "My Resume";
+  const title = resume.title || "My Resume";
+
+  const shareOptions = [
+    {
+      label: "WhatsApp", color: "#25d366", bg: "#f0fdf4",
+      icon: (<svg width="20" height="20" viewBox="0 0 24 24" fill="#25d366"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.025.507 3.934 1.399 5.61L0 24l6.554-1.374A11.932 11.932 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.001-1.368l-.36-.214-3.714.779.793-3.595-.235-.369A9.818 9.818 0 1112 21.818z"/></svg>),
+      onClick: () => { const msg = encodeURIComponent(`Hi! Please find my resume below\n\n📄 *${title}*\n👤 ${name}\n\n🔗 Download: ${resumeUrl}`); window.open(`https://wa.me/?text=${msg}`, "_blank"); onClose(); }
+    },
+    {
+      label: "Email", color: "#6366f1", bg: "#eef2ff",
+      icon: (<svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" stroke="#6366f1" strokeWidth="2" strokeLinecap="round"/></svg>),
+      onClick: () => { const subject = encodeURIComponent(`Resume - ${name}`); const body = encodeURIComponent(`Hi,\n\nPlease find my resume below.\n\n📄 ${title}\n👤 ${name}\n\n🔗 Download: ${resumeUrl}\n\nBest regards,\n${name}`); window.open(`https://mail.google.com/mail/?view=cm&fs=1&su=${subject}&body=${body}`, "_blank"); onClose(); }
+    },
+    {
+      label: "LinkedIn", color: "#0077b5", bg: "#eff8ff",
+      icon: (<svg width="20" height="20" viewBox="0 0 24 24" fill="#0077b5"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>),
+      onClick: () => { window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(resumeUrl)}`, "_blank"); onClose(); }
+    },
+    {
+      label: "Copy Link", color: "#f59e0b", bg: "#fffbeb",
+      icon: (<svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" stroke="#f59e0b" strokeWidth="2" strokeLinecap="round"/></svg>),
+      onClick: () => { navigator.clipboard.writeText(resumeUrl); onClose(); }
+    }
+  ];
+
+  return (
+    <>
+      <div onClick={onClose} style={{ position: "fixed", inset: 0, zIndex: 100 }} />
+      <div style={{ position: "absolute", right: 0, top: "calc(100% + 8px)", zIndex: 101, background: "#fff", borderRadius: 16, padding: 8, boxShadow: "0 20px 60px rgba(0,0,0,0.15)", width: 200, animation: "sharePopIn 0.2s cubic-bezier(0.4,0,0.2,1)" }}>
+        <style>{`@keyframes sharePopIn { from { opacity:0; transform:scale(0.9) translateY(-8px); } to { opacity:1; transform:scale(1) translateY(0); } } .share-opt-rb { transition: all 0.2s ease; } .share-opt-rb:hover { transform: translateX(4px); }`}</style>
+        <p style={{ fontSize: 11, fontWeight: 700, color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.05em", padding: "4px 8px 8px", margin: 0 }}>Share Resume</p>
+        {shareOptions.map((opt, i) => (
+          <button key={i} className="share-opt-rb"
+            onClick={(e) => { e.stopPropagation(); opt.onClick(); }}
+            style={{ width: "100%", display: "flex", alignItems: "center", gap: 10, padding: "10px 12px", borderRadius: 10, border: "none", background: "transparent", cursor: "pointer", textAlign: "left" }}
+            onMouseEnter={e => e.currentTarget.style.background = opt.bg}
+            onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
+            <div style={{ width: 32, height: 32, borderRadius: 8, background: opt.bg, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>{opt.icon}</div>
+            <span style={{ fontSize: 13, fontWeight: 600, color: "#334155" }}>{opt.label}</span>
+          </button>
+        ))}
+      </div>
+    </>
+  );
+}
+
 export default function ResumeBuilder() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -2443,7 +2495,7 @@ export default function ResumeBuilder() {
     try {
       // Capture the full content at natural size
       const canvas = await html2canvas(inner, {
-        scale: 3, useCORS: true, scrollY: 0, backgroundColor: '#ffffff'
+        scale: 2, useCORS: true, scrollY: 0, backgroundColor: '#ffffff'
       });
       // Create single-page A4 PDF by fitting the image
       const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
@@ -2484,6 +2536,7 @@ export default function ResumeBuilder() {
   
   const [templateStyle, setTemplateStyle] = useState("classic");
   const [showTemplateDropdown, setShowTemplateDropdown] = useState(false);
+  const [showShare, setShowShare] = useState(false);
   const [experiences, setExperiences] = useState([]);
   const [expForm, setExpForm] = useState({ company: "", role: "", start_date: "", end_date: "", description: "" });
 
@@ -2626,15 +2679,6 @@ export default function ResumeBuilder() {
         .rb-card:hover { border-color: #c7d2fe; box-shadow: 0 4px 12px rgba(99,102,241,0.08); }
         .rb-inp:focus { border-color: #818cf8; box-shadow: 0 0 0 3px rgba(129,140,248,0.12); background: #fff; }
         .rb-edit-modal { animation: slideIn 0.25s ease; }
-        @media (max-width: 768px) {
-          .rb-main-grid { display: flex !important; flex-direction: column !important; height: auto !important; }
-          .rb-left-panel { width: 100% !important; height: auto !important; border-right: none !important; border-bottom: 1px solid #e2e8f0 !important; }
-          .rb-right-panel { width: 100% !important; height: auto !important; padding: 16px 8px !important; }
-          .rb-header-right { flex-wrap: wrap !important; gap: 6px !important; }
-          .rb-header-right button { font-size: 11px !important; padding: 6px 10px !important; }
-          .rb-preview-wrapper { width: 100% !important; overflow-x: auto !important; }
-          
-        }
       `}</style>
 
       <header style={{
@@ -2655,7 +2699,7 @@ export default function ResumeBuilder() {
           <input value={resume.title} onChange={e => setResume({ ...resume, title: e.target.value })} placeholder="Resume Title"
             style={{ border: "none", outline: "none", fontSize: 15, fontWeight: 700, color: "#0f172a", background: "transparent", width: 220, fontFamily: "inherit" }} />
         </div>
-        <div className="rb-header-right" style={{ display: "flex", gap: 8, alignItems: "center" }}>
+        <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
           {/* Template Selector */}
           <div style={{ position: "relative" }}>
             <button onClick={() => setShowTemplateDropdown(!showTemplateDropdown)} style={{
@@ -2696,6 +2740,15 @@ export default function ResumeBuilder() {
                 </div>
               </>
             )}
+          </div>
+            {/* Share Button */}
+          <div style={{ position: "relative" }}>
+            <button onClick={() => setShowShare(!showShare)}
+              style={{ background: "linear-gradient(135deg, #22c55e, #16a34a)", color: "#fff", border: "none", borderRadius: 10, padding: "8px 18px", fontSize: 13, fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", gap: 6, fontFamily: "inherit" }}>
+              <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8M16 6l-4-4-4 4M12 2v13" stroke="white" strokeWidth="2.5" strokeLinecap="round"/></svg>
+              Share
+            </button>
+            {showShare && <SharePopupBuilder resume={resume} onClose={() => setShowShare(false)} />}
           </div>
           <button onClick={async () => { showToast("📄 Preparing PDF..."); await handlePrint(); }}
             style={{ background: "#059669", color: "#fff", border: "none", borderRadius: 10, padding: "8px 18px", fontSize: 13, fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", gap: 6, boxShadow: "0 2px 8px rgba(5,150,105,0.25)", transition: "all 0.2s ease", fontFamily: "inherit" }}>
@@ -2780,7 +2833,7 @@ export default function ResumeBuilder() {
             <div style={{ display: "flex", gap: 10, marginTop: 20, justifyContent: "flex-end" }}>
               <button onClick={() => setEditingItem(null)} style={{ background: "#f1f5f9", border: "1.5px solid #e2e8f0", borderRadius: 10, padding: "9px 20px", fontSize: 13, fontWeight: 600, cursor: "pointer", color: "#64748b", fontFamily: "inherit" }}>Cancel</button>
               <button onClick={() => {
-                const urlMap = { experience: `/api/experience/${editingItem.data.id}`, education: `/api/education/${editingItem.data.id}`, skills: `/api/skills/${editingItem.data.id}`, projects: `/api/projects/${editingItem.data.id}`, certs: `/api/certifications/${editingItem.data.id}` };
+                const urlMap = { experience: `${BASE}/api/experience/${editingItem.data.id}`, education: `${BASE}/api/education/${editingItem.data.id}`, skills: `${BASE}/api/skills/${editingItem.data.id}`, projects: `${BASE}/api/projects/${editingItem.data.id}`, certs: `${BASE}/api/certifications/${editingItem.data.id}` };
                 updateItem(urlMap[editingItem.type], editingItem.data, editingItem.type, editingItem.index);
               }} style={{ ...btn, fontFamily: "inherit" }}>Save Changes</button>
             </div>
@@ -2788,9 +2841,9 @@ export default function ResumeBuilder() {
         </div>
       )}
 
-      <div className="rb-main-grid" style={{ display: "grid", gridTemplateColumns: "1fr", height: "calc(100vh - 56px)" }}>
+      <div style={{ display: "grid", gridTemplateColumns: "480px 1fr", height: "calc(100vh - 56px)" }}>
         {/* LEFT */}
-        <div className="rb-left-panel" style={{ overflowY: "auto", padding: "24px 22px", borderRight: "1px solid #e2e8f0", background: "#fff" }}>
+        <div style={{ overflowY: "auto", padding: "24px 22px", borderRight: "1px solid #e2e8f0", background: "#fff" }}>
           <div style={{ display: "flex", gap: 3, backgroundColor: "#f1f5f9", borderRadius: 10, padding: 3, marginBottom: 24 }}>
             {TABS.map((tab, i) => (
               <button key={tab} onClick={() => setActiveTab(i)} className="rb-tab"
@@ -2993,7 +3046,7 @@ try {
                     </div>
                     <div style={{ display: "flex", gap: 4 }}>
                       <button style={editBtn} onClick={() => setEditingItem({ type: "projects", index: i, data: { ...p } })}>✏️ Edit</button>
-                      <button style={delBtn} onClick={() => deleteItem(`${BASE}/api/projects/${p.id}`, "projects", i)}>🗑️</button>
+                      <button style={delBtn} onClick={() => deleteItem(`/api/projects/${p.id}`, "projects", i)}>🗑️</button>
                     </div>
                   </div>
                 ))}
@@ -3058,7 +3111,7 @@ try {
                     </div>
                     <div style={{ display: "flex", gap: 4 }}>
                       <button style={editBtn} onClick={() => setEditingItem({ type: "certs", index: i, data: { ...c } })}>✏️ Edit</button>
-                      <button style={delBtn} onClick={() => deleteItem(`${BASE}/api/certifications/${c.id}`, "certs", i)}>🗑️</button>
+                      <button style={delBtn} onClick={() => deleteItem(`/api/certifications/${c.id}`, "certs", i)}>🗑️</button>
                     </div>
                   </div>
                 ))}
@@ -3075,7 +3128,7 @@ try {
         </div>
 
         {/* RIGHT — Live Preview */}
-        <div style={{ overflowY: "auto", background: "linear-gradient(180deg, #e2e8f0 0%, #cbd5e1 100%)", padding: "24px 0", display: "flex", justifyContent: "center", "@media(maxWidth:768px)": {display: "none"} }}>
+        <div style={{ overflowY: "auto", background: "linear-gradient(180deg, #e2e8f0 0%, #cbd5e1 100%)", padding: "24px 0", display: "flex", justifyContent: "center" }}>
           
           {/* ✅ The A4 Canvas Wrapper */}
           <div 
