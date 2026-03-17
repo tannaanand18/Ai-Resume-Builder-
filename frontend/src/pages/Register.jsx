@@ -38,7 +38,7 @@ function Register() {
         .reg-btn:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 8px 24px -6px rgba(99,102,241,0.4); }
         .reg-btn:disabled { opacity: 0.6; transform: none; box-shadow: none; cursor: not-allowed; }
         @keyframes spin { to { transform: rotate(360deg); } }
-        .spinner { width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; }
+        .spinner { width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; flex-shrink: 0; }
       `}</style>
 
       {/* Logo */}
@@ -87,7 +87,12 @@ function Register() {
                 <div className="spinner"></div>
                 Creating account...
               </>
-            ) : "Create Account"}
+            ) : (
+              <>
+                <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2M12 11a4 4 0 100-8 4 4 0 000 8zM19 8v6M22 11h-6" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                Create Account
+              </>
+            )}
           </button>
         </form>
 

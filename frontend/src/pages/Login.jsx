@@ -40,9 +40,11 @@ export default function Login() {
         @keyframes login-fade { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         .login-input { width: 100%; padding: 12px 16px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 14px; outline: none; transition: all 0.2s ease; background: #f8fafc; box-sizing: border-box; }
         .login-input:focus { border-color: #6366f1; background: #fff; box-shadow: 0 0 0 3px rgba(99,102,241,0.1); }
-        .login-btn { width: 100%; padding: 12px; border: none; border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer; transition: all 0.3s ease; background: linear-gradient(135deg, #6366f1, #8b5cf6); color: #fff; }
-        .login-btn:hover { transform: translateY(-1px); box-shadow: 0 8px 24px -6px rgba(99,102,241,0.4); }
-        .login-btn:disabled { opacity: 0.6; transform: none; box-shadow: none; cursor: not-allowed; }
+        .login-btn { width: 100%; padding: 12px; border: none; border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer; transition: all 0.3s ease; background: linear-gradient(135deg, #6366f1, #8b5cf6); color: #fff; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .login-btn:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 8px 24px -6px rgba(99,102,241,0.4); }
+        .login-btn:disabled { opacity: 0.7; transform: none; box-shadow: none; cursor: not-allowed; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .auth-spinner { width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; flex-shrink: 0; }
       `}</style>
 
       {/* Logo */}
@@ -91,7 +93,17 @@ export default function Login() {
           </div>
 
           <button type="submit" disabled={loading} className="login-btn">
-            {loading ? "Signing in..." : "Sign In"}
+            {loading ? (
+              <>
+                <div className="auth-spinner"></div>
+                Signing in...
+              </>
+            ) : (
+              <>
+                <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4M10 17l5-5-5-5M15 12H3" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                Sign In
+              </>
+            )}
           </button>
         </form>
 
