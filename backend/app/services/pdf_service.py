@@ -356,7 +356,7 @@ def pdf_creative(data, buffer):
 # ═══════════════════════════════════════════
 # Map template_style values to PDF renderers
 STYLE_TO_PDF = {
-    # Modern/sidebar templates
+    # Modern = dark sidebar layout (navy left panel + main right panel)
     "modern": "modern",
     "sidebar": "modern",
     "meghana": "modern",
@@ -364,15 +364,16 @@ STYLE_TO_PDF = {
     "atlantic_blue": "modern",
     "quiet_blue": "modern",
     "slate_dawn": "modern",
-    # Creative/colorful templates  
+    "hunter_green": "modern",   # green sidebar -> use sidebar PDF layout
+    "rosewood": "modern",       # colored sidebar -> use sidebar PDF layout
+    "blue_accent": "modern",    # colored sidebar -> use sidebar PDF layout
+    "green_accent": "modern",   # colored sidebar -> use sidebar PDF layout
+    "silver": "modern",         # sidebar style
+    # Creative = colored banner header
     "creative": "creative",
     "obsidian": "creative",
     "black_pattern": "creative",
-    "hunter_green": "creative",
-    "rosewood": "creative",
-    "blue_accent": "creative",
-    "green_accent": "creative",
-    # Simple/classic templates (all others)
+    # Simple/classic = clean serif centered
     "simple": "simple",
     "classic": "simple",
     "corporate": "simple",
@@ -381,7 +382,6 @@ STYLE_TO_PDF = {
     "annafield": "simple",
     "finance": "simple",
     "banking": "simple",
-    "silver": "simple",
     "mercury": "simple",
     "simplyblue": "simple",
     "simplyblue_modern": "simple",
