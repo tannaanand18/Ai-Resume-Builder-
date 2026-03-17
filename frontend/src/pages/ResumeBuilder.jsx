@@ -2544,14 +2544,23 @@ export default function ResumeBuilder() {
       const canvas = document.querySelector(".rb-preview-canvas");
       if (!canvas) return;
       if (window.innerWidth <= 768) {
-        const screenW = window.innerWidth - 24;
-        const canvasW = 794; // 210mm in px
-        const scale = screenW / canvasW;
+        const A4_WIDTH_PX = 794;
+        const screenW = window.innerWidth;
+        const scale = screenW / A4_WIDTH_PX;
+        const scaledHeight = 1123 * scale; // A4 height scaled
         canvas.style.transform = `scale(${scale})`;
-        canvas.style.transformOrigin = "top center";
-        canvas.style.marginBottom = `-${794 * (1 - scale)}px`;
+        canvas.style.transformOrigin = "top left";
+        canvas.style.width = `${A4_WIDTH_PX}px`;
+        canvas.style.height = `1123px`;
+        canvas.style.marginBottom = `${scaledHeight - 1123}px`;
+        // Make parent tall enough
+        const parent = canvas.parentElement;
+        if (parent) parent.style.minHeight = `${scaledHeight + 32}px`;
       } else {
         canvas.style.transform = "none";
+        canvas.style.transformOrigin = "top center";
+        canvas.style.width = "210mm";
+        canvas.style.height = "297mm";
         canvas.style.marginBottom = "0";
       }
     };
@@ -2701,15 +2710,42 @@ export default function ResumeBuilder() {
       }
       @media (max-width: 768px) {
         .rb-mobile-toggle { display: flex !important; }
-        .rb-main-grid { grid-template-columns: 1fr !important; height: auto !important; }
+        .rb-main-grid {
+          grid-template-columns: 1fr !important;
+          height: auto !important;
+          width: 100vw !important;
+        }
         .rb-panel-hidden { display: none !important; }
-        .rb-panel-left { display: block !important; height: calc(100vh - 112px); overflow-y: auto; width: 100% !important; }
-        .rb-panel-right { display: flex !important; flex-direction: column !important; align-items: center !important; width: 100% !important; min-height: calc(100vh - 112px); padding: 12px 0 !important; overflow-y: auto !important; }
+        .rb-panel-left {
+          display: block !important;
+          width: 100vw !important;
+          min-height: calc(100vh - 112px) !important;
+          height: auto !important;
+          overflow-y: auto !important;
+          padding: 16px !important;
+          box-sizing: border-box !important;
+        }
+        .rb-panel-right {
+          display: block !important;
+          width: 100vw !important;
+          min-height: calc(100vh - 112px) !important;
+          overflow-x: hidden !important;
+          overflow-y: auto !important;
+          padding: 0 !important;
+          background: #f1f5f9 !important;
+        }
+        .rb-preview-canvas {
+          width: 100vw !important;
+          height: auto !important;
+          min-height: unset !important;
+          transform-origin: top left !important;
+          box-shadow: none !important;
+          overflow: visible !important;
+        }
         .rb-inp { font-size: 16px !important; }
         .rb-tab { padding: 6px 4px !important; font-size: 10px !important; }
         .rb-navbar-right { gap: 4px !important; }
         .rb-navbar-right .rb-btn-text { display: none !important; }
-        .rb-preview-canvas { width: 100% !important; height: auto !important; transform: none !important; overflow: visible !important; }
       }
     `;
     document.head.appendChild(styleEl);
