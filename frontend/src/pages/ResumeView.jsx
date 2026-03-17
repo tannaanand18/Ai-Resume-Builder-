@@ -39,7 +39,7 @@ export default function ResumeView() {
     const encodedText = encodeURIComponent(text);
     const urls = {
       whatsapp: `https://wa.me/?text=${encodedText}%0A${encodedUrl}`,
-      email: `mailto:?subject=${encodedText}&body=${encodedText}%0A%0AView Resume%3A%20${encodedUrl}`,
+      email: `https://mail.google.com/mail/?view=cm&fs=1&su=${encodedText}&body=${encodedText}%0A%0AView%20Resume%3A%20${encodedUrl}`,
       linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`,
     };
     window.open(urls[platform], "_blank");
@@ -52,7 +52,8 @@ export default function ResumeView() {
     try {
       const name = data?.resume?.full_name || "resume";
       const filename = `${name.replace(/\s+/g, "_")}_Resume.pdf`;
-      const res = await fetch(`${BASE}/api/resume/public-pdf/${id}`);
+      const template = data?.resume?.template_name || "creative";
+      const res = await fetch(`${BASE}/api/resume/public-pdf/${id}?template=${template}`);
       if (res.ok) {
         const blob = await res.blob();
         const url = URL.createObjectURL(blob);
@@ -308,3 +309,4 @@ function Section({ title, children }) {
     </div>
   );
 }
+

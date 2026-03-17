@@ -145,16 +145,5 @@ def get_public_resume(resume_id):
         return jsonify({"error": str(e)}), 500
 
 
-@resume_bp.route("/public-pdf/<int:resume_id>", methods=["GET"])
-def download_public_pdf(resume_id):
-    """Public PDF download - no login required"""
-    try:
-        resume = Resume.query.filter_by(id=resume_id).first()
-        if not resume:
-            return jsonify({"error": "Resume not found"}), 404
-        pdf = generate_resume_pdf(resume_id)
-        name = resume.full_name or resume.title or "resume"
-        filename = f"{name.replace(' ', '_')}_Resume.pdf"
-        return send_file(pdf, as_attachment=True, download_name=filename, mimetype="application/pdf")
-    except Exception as e:
-        return jsonify({"error": f"Failed to generate PDF: {str(e)}"}), 500
+PLACEHOLDER
+
