@@ -2545,23 +2545,40 @@ export default function ResumeBuilder() {
       if (!canvas) return;
       if (window.innerWidth <= 768) {
         const A4_WIDTH_PX = 794;
+        const A4_HEIGHT_PX = 1123;
         const screenW = window.innerWidth;
         const scale = screenW / A4_WIDTH_PX;
-        const scaledHeight = 1123 * scale; // A4 height scaled
-        canvas.style.transform = `scale(${scale})`;
-        canvas.style.transformOrigin = "top left";
+        const scaledHeight = A4_HEIGHT_PX * scale;
+        // Reset inline size first
         canvas.style.width = `${A4_WIDTH_PX}px`;
-        canvas.style.height = `1123px`;
-        canvas.style.marginBottom = `${scaledHeight - 1123}px`;
-        // Make parent tall enough
+        canvas.style.height = `${A4_HEIGHT_PX}px`;
+        canvas.style.transform = `scale(${scale})`;
+        canvas.style.transformOrigin = "top center";
+        canvas.style.display = "block";
+        canvas.style.marginLeft = "auto";
+        canvas.style.marginRight = "auto";
+        canvas.style.marginTop = "0";
+        canvas.style.marginBottom = `${-(A4_HEIGHT_PX - scaledHeight)}px`;
+        // Wrap parent to correct height
         const parent = canvas.parentElement;
-        if (parent) parent.style.minHeight = `${scaledHeight + 32}px`;
+        if (parent) {
+          parent.style.height = `${scaledHeight + 24}px`;
+          parent.style.overflow = "hidden";
+          parent.style.width = "100%";
+        }
       } else {
         canvas.style.transform = "none";
         canvas.style.transformOrigin = "top center";
         canvas.style.width = "210mm";
         canvas.style.height = "297mm";
         canvas.style.marginBottom = "0";
+        canvas.style.marginLeft = "";
+        canvas.style.marginRight = "";
+        const parent = canvas.parentElement;
+        if (parent) {
+          parent.style.height = "";
+          parent.style.overflow = "";
+        }
       }
     };
     scaleCanvas();
@@ -2735,12 +2752,7 @@ export default function ResumeBuilder() {
           background: #f1f5f9 !important;
         }
         .rb-preview-canvas {
-          width: 100vw !important;
-          height: auto !important;
-          min-height: unset !important;
-          transform-origin: top left !important;
           box-shadow: none !important;
-          overflow: visible !important;
         }
         .rb-inp { font-size: 16px !important; }
         .rb-tab { padding: 6px 4px !important; font-size: 10px !important; }
