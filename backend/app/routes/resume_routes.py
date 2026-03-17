@@ -154,10 +154,14 @@ def download_public_pdf(resume_id):
             return jsonify({"error": "Resume not found"}), 404
         requested_template = request.args.get("template", None)
         if requested_template:
-            original = resume.template_name
-            resume.template_name = requested_template
+            # Override BOTH template_name and template_style so pdf_service picks it up correctly
+            original_name  = resume.template_name
+            original_style = resume.template_style
+            resume.template_name  = requested_template
+            resume.template_style = requested_template
             pdf = generate_resume_pdf(resume_id)
-            resume.template_name = original
+            resume.template_name  = original_name
+            resume.template_style = original_style
         else:
             pdf = generate_resume_pdf(resume_id)
         name = resume.full_name or resume.title or "resume"
