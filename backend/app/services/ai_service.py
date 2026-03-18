@@ -93,3 +93,67 @@ def generate_project_description(data):
         max_tokens=300,
     )
     return response.choices[0].message.content.strip()
+
+def check_ats_score(resume_data, job_description):
+    import json
+    api_key = os.getenv("GROQ_API_KEY")
+    if not api_key:
+        raise ValueError("GROQ_API_KEY is not set")
+    client = Groq(api_key=api_key)
+
+    prompt = f"""
+You are an expert ATS (Applicant Tracking System) analyzer.
+
+Analyze this resume against the job description and return ONLY a valid JSON object.
+
+JOB DESCRIPTION:
+{job_description}
+
+RESUME:
+Name: {resume_data.get('full_name', '')}
+Title: {resume_data.get('professional_title', '')}
+Summary: {resume_data.get('summary', '')}
+Experience: {resume_data.get('experience', '')}
+Education: {resume_data.get('education', '')}
+Skills: {resume_data.get('skills', '')}
+Projects: {resume_data.get('projects', '')}
+Certifications: {resume_data.get('certifications', '')}
+
+Return ONLY this JSON (no markdown, no extra text):
+{{
+  "score": <number 0-100>,
+  "grade": "<A/B/C/D/F>",
+  "summary": "<2 sentence overall assessment>",
+  "matched_keywords": ["keyword1", "keyword2"],
+  "missing_keywords": ["keyword1", "keyword2"],
+  "strengths": ["strength1", "strength2", "strength3"],
+  "improvements": [
+    {{"section": "Summary", "issue": "...", "suggestion": "..."}},
+    {{"section": "Skills", "issue": "...", "suggestion": "..."}},
+    {{"section": "Experience", "issue": "...", "suggestion": "..."}}
+  ],
+  "quick_wins": ["tip1", "tip2", "tip3"]
+}}
+"""
+
+    response = client.chat.completions.create(
+        model="llama-3.1-8b-instant",
+        messages=[
+            {"role": "system", "content": "You are an ATS expert. Return only valid JSON, no markdown, no extra text."},
+            {"role": "user", "content": prompt}
+        ],
+        temperature=0.3,
+        max_tokens=1500,
+    )
+
+    raw = response.choices[0].message.content.strip()
+    if "```" in raw:
+        parts = raw.split("```")
+        for part in parts:
+            part = part.strip()
+            if part.startswith("json"):
+                part = part[4:].strip()
+            if part.startswith("{"):
+                raw = part
+                break
+    return json.loads(raw)

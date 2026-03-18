@@ -1,7 +1,12 @@
-from flask import Blueprint, jsonify,request
+from flask import Blueprint, jsonify, request
+from app.models.experience import Experience
+from app.models.education import Education
+from app.models.skills import Skill
+from app.models.project import Project
+from app.models.certification import Certification
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from app.models.resume import Resume
-from app.services.ai_service import generate_summary,generate_experience_description,generate_project_description
+from app.services.ai_service import generate_summary,generate_experience_description,generate_project_description,check_ats_score
 
 
 ai_bp = Blueprint("ai", __name__)
@@ -49,3 +54,40 @@ def ai_generate_project():
         "tech_stack": data.get("tech_stack", "")
     })
     return jsonify({"description": description}), 200
+
+@ai_bp.route("/ats-check/<int:resume_id>", methods=["POST"])
+@jwt_required()
+def ai_ats_check(resume_id):
+    try:
+        user_id = get_jwt_identity()
+        resume = Resume.query.filter_by(id=resume_id, user_id=int(user_id)).first()
+        if not resume:
+            return jsonify({"error": "Resume not found"}), 404
+
+        data = request.get_json()
+        job_description = data.get("job_description", "").strip()
+        if not job_description:
+            return jsonify({"error": "Job description is required"}), 400
+
+        experiences = Experience.query.filter_by(resume_id=resume_id).all()
+        educations = Education.query.filter_by(resume_id=resume_id).all()
+        skills = Skill.query.filter_by(resume_id=resume_id).all()
+        projects = Project.query.filter_by(resume_id=resume_id).all()
+        certs = Certification.query.filter_by(resume_id=resume_id).all()
+
+        resume_data = {
+            "full_name": resume.full_name or "",
+            "professional_title": resume.professional_title or "",
+            "summary": resume.summary or "",
+            "experience": " | ".join([f"{e.role} at {e.company}: {e.description or ''}" for e in experiences]),
+            "education": " | ".join([f"{e.degree} from {e.institution}" for e in educations]),
+            "skills": ", ".join([s.skill_name for s in skills]),
+            "projects": " | ".join([f"{p.project_title} ({p.tech_stack or ''}): {p.description or ''}" for p in projects]),
+            "certifications": ", ".join([c.title for c in certs]),
+        }
+
+        result = check_ats_score(resume_data, job_description)
+        return jsonify(result), 200
+
+    except Exception as e:
+        return jsonify({"error": f"ATS check failed: {str(e)}"}), 500

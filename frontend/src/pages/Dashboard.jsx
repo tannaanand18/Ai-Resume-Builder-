@@ -275,7 +275,11 @@ export default function Dashboard() {
             <h1 style={{ fontSize: 28, fontWeight: 800, color: "#0f172a", margin: 0, letterSpacing: "-0.02em" }}>My Resumes</h1>
             <p style={{ color: "#64748b", fontSize: 14, marginTop: 4 }}>Create and manage your AI-powered resumes</p>
           </div>
-          <button className="dash-btn-new" onClick={() => navigate("/resume/new")}
+          <button onClick={() => navigate("/ats-checker")} style={{ display:"flex", alignItems:"center", gap:6, background:"linear-gradient(135deg,#f0fdf4,#dcfce7)", border:"1.5px solid #86efac", borderRadius:10, padding:"8px 16px", cursor:"pointer", fontSize:13, fontWeight:700, color:"#16a34a" }}>
+              <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke="#16a34a" strokeWidth="2.5" strokeLinecap="round"/></svg>
+              ATS Checker
+            </button>
+            <button className="dash-btn-new" onClick={() => navigate("/resume/new")}
             style={{ display: "flex", alignItems: "center", gap: 8, background: "linear-gradient(135deg, #6366f1, #8b5cf6)", color: "#fff", border: "none", padding: "10px 20px", borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: "pointer", whiteSpace: "nowrap" }}>
             <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" stroke="white" strokeWidth="2.5" strokeLinecap="round"/></svg>
             New Resume
