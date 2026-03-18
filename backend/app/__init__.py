@@ -36,7 +36,7 @@ def create_app(test_config=None):
         "http://localhost:5174",
         "http://localhost:5175",
         "http://127.0.0.1:5173",
-        frontend_url,
+        frontend_url,"https://resumebuilder-kappa-nine.vercel.app",
     ]
 
     # Remove duplicates and empty strings
