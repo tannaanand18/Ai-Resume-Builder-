@@ -97,18 +97,23 @@ def ai_ats_check(resume_id):
 def ai_ats_check_text():
     try:
         data = request.get_json()
-        resume_text = data.get("resume_text", "")
+        resume_text = data.get("resume_text", "").strip()
         job_description = data.get("job_description", "").strip()
         file_name = data.get("file_name", "Uploaded file")
+
         if not job_description:
             return jsonify({"error": "Job description is required"}), 400
+
+        if not resume_text or len(resume_text) < 50:
+            return jsonify({"error": "Could not read resume text. Please use a text-based PDF or select a saved resume instead."}), 400
+
         resume_data = {
-            "full_name": file_name,
+            "full_name": file_name.replace(".pdf","").replace(".docx",""),
             "professional_title": "Uploaded Resume",
-            "summary": resume_text[:500],
-            "experience": resume_text[500:1500],
-            "education": "",
-            "skills": resume_text[1500:2000],
+            "summary": resume_text[:600],
+            "experience": resume_text[600:1800],
+            "education": resume_text[1800:2400],
+            "skills": resume_text[2400:3000],
             "projects": "",
             "certifications": "",
         }

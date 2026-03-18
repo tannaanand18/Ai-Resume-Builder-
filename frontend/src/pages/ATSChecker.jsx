@@ -86,7 +86,15 @@ export default function ATSChecker() {
         res = await api.post(`/ai/ats-check/${selectedId}`, { job_description: jobDesc });
       } else {
         // PDF mode — read text then send
-        const text = await pdfFile.text().catch(() => "");
+        // PDF mode — read as text (works for .txt and .docx only; PDF needs backend parser)
+let text = "";
+if (pdfFile.name.endsWith(".txt")) {
+  text = await pdfFile.text().catch(() => "");
+} else if (pdfFile.name.endsWith(".pdf") || pdfFile.name.endsWith(".docx")) {
+  // Send filename — backend will return error if unreadable
+  text = `Resume file: ${pdfFile.name}. Please note PDF binary content cannot be parsed in browser.`;
+  toast("For best results, use My Saved Resumes tab — PDF parsing has limitations.", { icon: "⚠️" });
+}
         res = await api.post("/ai/ats-check-text", {
           resume_text: text || pdfFile.name,
           job_description: jobDesc,
