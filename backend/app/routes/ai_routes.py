@@ -91,3 +91,28 @@ def ai_ats_check(resume_id):
 
     except Exception as e:
         return jsonify({"error": f"ATS check failed: {str(e)}"}), 500
+
+@ai_bp.route("/ats-check-text", methods=["POST"])
+@jwt_required()
+def ai_ats_check_text():
+    try:
+        data = request.get_json()
+        resume_text = data.get("resume_text", "")
+        job_description = data.get("job_description", "").strip()
+        file_name = data.get("file_name", "Uploaded file")
+        if not job_description:
+            return jsonify({"error": "Job description is required"}), 400
+        resume_data = {
+            "full_name": file_name,
+            "professional_title": "Uploaded Resume",
+            "summary": resume_text[:500],
+            "experience": resume_text[500:1500],
+            "education": "",
+            "skills": resume_text[1500:2000],
+            "projects": "",
+            "certifications": "",
+        }
+        result = check_ats_score(resume_data, job_description)
+        return jsonify(result), 200
+    except Exception as e:
+        return jsonify({"error": f"ATS check failed: {str(e)}"}), 500
