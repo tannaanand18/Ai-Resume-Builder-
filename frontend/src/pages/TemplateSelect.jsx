@@ -1246,6 +1246,21 @@ const res = await fetch(`${BASE}/api/resume/`, {
           color: #4f46e5;
         }
         .ts-back-btn:hover .btn-arrow { transform: translateX(-4px); }
+        @media (max-width: 640px) {
+          .ts-filter-btn { padding: 8px 14px !important; font-size: 12px !important; }
+          .ts-search-input { font-size: 14px !important; padding: 11px 16px 11px 42px !important; }
+          .ts-back-btn { padding: 7px 12px !important; font-size: 12px !important; }
+          .ts-back-btn span { display: none; }
+          .ts-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 14px !important; }
+          .ts-hero-h1 { font-size: 26px !important; }
+          .ts-hero-p { font-size: 14px !important; }
+          .ts-main { padding: 32px 14px 60px !important; }
+          .ts-header { padding: 0 14px !important; }
+          .ts-card-footer { padding: 10px 12px 12px !important; }
+        }
+        @media (max-width: 400px) {
+          .ts-grid { grid-template-columns: 1fr !important; }
+        }
       `}</style>
 
       {/* Header */}
@@ -1253,7 +1268,7 @@ const res = await fetch(`${BASE}/api/resume/`, {
         backgroundColor: "rgba(255, 255, 255, 0.7)",
         backdropFilter: "blur(16px)",
         borderBottom: "1px solid rgba(229,231,235,0.6)",
-        padding: "0 32px",
+        padding: "0 24px",
         height: 64,
         display: "flex",
         alignItems: "center",
@@ -1286,7 +1301,7 @@ const res = await fetch(`${BASE}/api/resume/`, {
         </button>
       </header>
 
-      <main style={{ maxWidth: 1200, margin: "0 auto", padding: "56px 24px 80px" }}>
+      <main className="ts-main" style={{ maxWidth: 1200, margin: "0 auto", padding: "56px 24px 80px" }}>
 
         {/* Hero */}
         <div style={{
@@ -1386,7 +1401,7 @@ const res = await fetch(`${BASE}/api/resume/`, {
         )}
 
         {/* Template Grid */}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))", gap: 28 }}>
+        <div className="ts-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: 24 }}>
           {filteredTemplates.map((t, index) => (
             <div
               key={`${t.style}-${index}`}
@@ -1423,7 +1438,7 @@ const res = await fetch(`${BASE}/api/resume/`, {
 
               {/* Card Footer */}
               <div style={{
-                padding: "14px 18px 16px",
+                className="ts-card-footer", padding: "14px 18px 16px",
                 borderTop: "1px solid #f0f1f5"
               }}>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>

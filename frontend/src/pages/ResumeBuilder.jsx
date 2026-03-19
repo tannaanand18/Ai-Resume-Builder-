@@ -2727,9 +2727,12 @@ export default function ResumeBuilder() {
       .rb-mobile-toggle {
         display: none;
         gap: 4px;
-        padding: 8px 16px;
+        padding: 8px 12px;
         background: #fff;
         border-bottom: 1px solid #e2e8f0;
+        position: sticky;
+        top: 56px;
+        z-index: 40;
       }
       @media (max-width: 768px) {
         .rb-mobile-toggle { display: flex !important; }
@@ -2741,29 +2744,39 @@ export default function ResumeBuilder() {
         .rb-panel-hidden { display: none !important; }
         .rb-panel-left {
           display: block !important;
-          width: 100vw !important;
+          width: 100% !important;
           min-height: calc(100vh - 112px) !important;
           height: auto !important;
           overflow-y: auto !important;
-          padding: 16px !important;
+          padding: 14px !important;
           box-sizing: border-box !important;
         }
         .rb-panel-right {
           display: block !important;
-          width: 100vw !important;
+          width: 100% !important;
           min-height: calc(100vh - 112px) !important;
           overflow-x: hidden !important;
           overflow-y: auto !important;
           padding: 0 !important;
           background: #f1f5f9 !important;
         }
-        .rb-preview-canvas {
-          box-shadow: none !important;
-        }
+        .rb-preview-canvas { box-shadow: none !important; }
         .rb-inp { font-size: 16px !important; }
-        .rb-tab { padding: 6px 4px !important; font-size: 10px !important; }
+        .rb-tab { padding: 6px 2px !important; font-size: 10px !important; }
         .rb-navbar-right { gap: 4px !important; }
         .rb-navbar-right .rb-btn-text { display: none !important; }
+        .rb-title-input { width: 120px !important; font-size: 13px !important; }
+        .rb-header-back span { display: none; }
+        .rb-edit-modal-inner { max-width: calc(100vw - 32px) !important; padding: 20px !important; }
+        .rb-edit-modal-grid { grid-template-columns: 1fr !important; }
+        .rb-share-popup { right: -60px !important; }
+        .rb-personal-grid { grid-template-columns: 1fr !important; }
+        .rb-form-grid { grid-template-columns: 1fr !important; }
+        .rb-extra-grid { grid-template-columns: 1fr !important; }
+      }
+      @media (max-width: 480px) {
+        .rb-tab { font-size: 9px !important; padding: 5px 1px !important; }
+        .rb-title-input { width: 90px !important; font-size: 12px !important; }
       }
     `;
     document.head.appendChild(styleEl);
@@ -2803,7 +2816,7 @@ export default function ResumeBuilder() {
           </button>
           <div style={{ width: 1, height: 24, background: "#e2e8f0" }} />
           <input value={resume.title} onChange={e => setResume({ ...resume, title: e.target.value })} placeholder="Resume Title"
-            style={{ border: "none", outline: "none", fontSize: 15, fontWeight: 700, color: "#0f172a", background: "transparent", width: 220, fontFamily: "inherit" }} />
+            className="rb-title-input" style={{ border: "none", outline: "none", fontSize: 15, fontWeight: 700, color: "#0f172a", background: "transparent", width: 220, fontFamily: "inherit" }} />
         </div>
         <div className="rb-navbar-right" style={{ display: "flex", gap: 8, alignItems: "center" }}>
           {/* Template Selector */}
@@ -2896,7 +2909,7 @@ export default function ResumeBuilder() {
             </div>
 
             {editingItem.type === "experience" && (
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+              <div className="rb-edit-modal-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
                 {[["Company", "company"], ["Role", "role"], ["Start Date", "start_date"], ["End Date", "end_date"]].map(([l, k]) => (
                   <div key={k}><label style={lbl}>{l}</label><input className="rb-inp" style={inp} value={editingItem.data[k] || ""} onChange={e => setEditingItem({ ...editingItem, data: { ...editingItem.data, [k]: e.target.value } })} /></div>
                 ))}
@@ -2904,14 +2917,14 @@ export default function ResumeBuilder() {
               </div>
             )}
             {editingItem.type === "education" && (
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+              <div className="rb-edit-modal-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
                 {[["Degree", "degree"], ["Institution", "institution"], ["Start Year", "start_year"], ["End Year", "end_year"], ["Grade / Score", "score"]].map(([l, k]) => (
                   <div key={k}><label style={lbl}>{l}</label><input className="rb-inp" style={inp} value={editingItem.data[k] || ""} onChange={e => setEditingItem({ ...editingItem, data: { ...editingItem.data, [k]: e.target.value } })} /></div>
                 ))}
               </div>
             )}
             {editingItem.type === "skills" && (
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+              <div className="rb-edit-modal-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
                 <div><label style={lbl}>Skill Name</label><input className="rb-inp" style={inp} value={editingItem.data.name || ""} onChange={e => setEditingItem({ ...editingItem, data: { ...editingItem.data, name: e.target.value } })} /></div>
                 <div><label style={lbl}>Level</label>
                   <select className="rb-inp" style={inp} value={editingItem.data.level || "Intermediate"} onChange={e => setEditingItem({ ...editingItem, data: { ...editingItem.data, level: e.target.value } })}>
@@ -2921,7 +2934,7 @@ export default function ResumeBuilder() {
               </div>
             )}
             {editingItem.type === "projects" && (
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+              <div className="rb-edit-modal-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
                 {[["Title", "title"], ["Tech Stack", "tech_stack"], ["Link", "link"]].map(([l, k]) => (
                   <div key={k}><label style={lbl}>{l}</label><input className="rb-inp" style={inp} value={editingItem.data[k] || ""} onChange={e => setEditingItem({ ...editingItem, data: { ...editingItem.data, [k]: e.target.value } })} /></div>
                 ))}
@@ -2929,7 +2942,7 @@ export default function ResumeBuilder() {
               </div>
             )}
             {editingItem.type === "certs" && (
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+              <div className="rb-edit-modal-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
                 {[["Name", "name"], ["Issuer", "issuer"], ["Issue Date", "issue_date"], ["Expiry Date", "expiry_date"]].map(([l, k]) => (
                   <div key={k}><label style={lbl}>{l}</label><input className="rb-inp" style={inp} value={editingItem.data[k] || ""} onChange={e => setEditingItem({ ...editingItem, data: { ...editingItem.data, [k]: e.target.value } })} /></div>
                 ))}
@@ -2990,7 +3003,7 @@ export default function ResumeBuilder() {
               <div>
                 <h2 style={{ fontWeight: 800, fontSize: 18, marginBottom: 4, color: "#0f172a" }}>Personal Details</h2>
                 <p style={{ fontSize: 12, color: "#94a3b8", marginBottom: 20 }}>This information appears at the top of your resume.</p>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 18 }}>
+                <div className="rb-personal-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 18 }}>
                   {[["Full Name", "full_name", "e.g. Anna Field"], ["Professional Title", "professional_title", "Target position or current role"], ["Email", "email", "Enter email"], ["Phone", "phone", "Enter Phone"]].map(([label, key, ph]) => (
                     <div key={key} style={fld}><label style={lbl}>{label}</label><input className="rb-inp" style={inp} placeholder={ph} value={resume[key]} onChange={e => setResume({ ...resume, [key]: e.target.value })} /></div>
                   ))}
@@ -3004,7 +3017,7 @@ export default function ResumeBuilder() {
                     ))}
                   </div>
                   {showExtra && (
-                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 18, marginTop: 16 }}>
+                    <div className="rb-extra-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 18, marginTop: 16 }}>
                       {[["LinkedIn", "linkedin", "linkedin.com/in/yourname"], ["Website", "website", "yourwebsite.com"], ["Nationality", "nationality", "e.g. Indian"], ["Date of Birth", "date_of_birth", "DD/MM/YYYY"]].map(([label, key, ph]) => (
                         <div key={key} style={fld}><label style={lbl}>{label}</label><input className="rb-inp" style={inp} placeholder={ph} value={resume[key]} onChange={e => setResume({ ...resume, [key]: e.target.value })} /></div>
                       ))}
@@ -3062,7 +3075,7 @@ try {
                   </div>
                 ))}
                 {experiences.length > 0 && <div style={{ borderTop: "1.5px dashed #e2e8f0", margin: "18px 0 16px", position: "relative" }}><span style={{ position: "absolute", top: -10, left: 16, background: "#fff", padding: "0 8px", fontSize: 11, fontWeight: 600, color: "#94a3b8" }}>Add New</span></div>}
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 16 }}>
+                <div className="rb-form-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 16 }}>
                   {[["Company", "company", "e.g. Google"], ["Role", "role", "e.g. Software Engineer"], ["Start Date", "start_date", "Jan 2022"], ["End Date", "end_date", "Present"]].map(([label, key, ph]) => (
                     <div key={key}><label style={lbl}>{label}</label><input className="rb-inp" style={inp} placeholder={ph} value={expForm[key]} onChange={e => setExpForm({ ...expForm, [key]: e.target.value })} /></div>
                   ))}
@@ -3129,7 +3142,7 @@ try {
                   </div>
                 ))}
                 {educations.length > 0 && <div style={{ borderTop: "1.5px dashed #e2e8f0", margin: "18px 0 16px", position: "relative" }}><span style={{ position: "absolute", top: -10, left: 16, background: "#fff", padding: "0 8px", fontSize: 11, fontWeight: 600, color: "#94a3b8" }}>Add New</span></div>}
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 16 }}>
+                <div className="rb-form-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 16 }}>
                   {[["Degree", "degree", "e.g. B.Tech"], ["Institution", "institution", "e.g. IIT Bombay"], ["Start Year", "start_year", "2018"], ["End Year", "end_year", "2022"], ["Grade / Score", "score", "e.g. 79% or 9.08 CGPA"]].map(([label, key, ph]) => (
                     <div key={key}><label style={lbl}>{label}</label><input className="rb-inp" style={inp} placeholder={ph} value={eduForm[key]} onChange={e => setEduForm({ ...eduForm, [key]: e.target.value })} /></div>
                   ))}
@@ -3181,7 +3194,7 @@ try {
                   </div>
                 ))}
                 {projects.length > 0 && <div style={{ borderTop: "1.5px dashed #e2e8f0", margin: "18px 0 16px", position: "relative" }}><span style={{ position: "absolute", top: -10, left: 16, background: "#fff", padding: "0 8px", fontSize: 11, fontWeight: 600, color: "#94a3b8" }}>Add New</span></div>}
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 16 }}>
+                <div className="rb-form-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 16 }}>
                   {[["Title", "title", "e.g. AI Resume Builder"], ["Tech Stack", "tech_stack", "React, Flask"], ["Link", "link", "https://github.com/..."]].map(([label, key, ph]) => (
                     <div key={key}><label style={lbl}>{label}</label><input className="rb-inp" style={inp} placeholder={ph} value={projForm[key]} onChange={e => setProjForm({ ...projForm, [key]: e.target.value })} /></div>
                   ))}
@@ -3246,7 +3259,7 @@ try {
                   </div>
                 ))}
                 {certs.length > 0 && <div style={{ borderTop: "1.5px dashed #e2e8f0", margin: "18px 0 16px", position: "relative" }}><span style={{ position: "absolute", top: -10, left: 16, background: "#fff", padding: "0 8px", fontSize: 11, fontWeight: 600, color: "#94a3b8" }}>Add New</span></div>}
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 16 }}>
+                <div className="rb-form-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 16 }}>
                   {[["Name", "name", "AWS Solutions Architect"], ["Issuer", "issuer", "Amazon"], ["Issue Date", "issue_date", "Jan 2023"], ["Expiry Date", "expiry_date", "Jan 2026"]].map(([label, key, ph]) => (
                     <div key={key}><label style={lbl}>{label}</label><input className="rb-inp" style={inp} placeholder={ph} value={certForm[key]} onChange={e => setCertForm({ ...certForm, [key]: e.target.value })} /></div>
                   ))}
