@@ -2546,8 +2546,7 @@ export default function ResumeBuilder() {
       if (window.innerWidth <= 768) {
         const A4_W = 794;
         const A4_H = 1123;
-        const sw = window.innerWidth;
-        const scale = sw / A4_W;
+        const padding = 16; const availW = window.innerWidth - (padding * 2); const scale = availW / A4_W;
         const scaledH = A4_H * scale;
         // Set fixed A4 size
         canvas.style.width = A4_W + "px";
@@ -2557,10 +2556,8 @@ export default function ResumeBuilder() {
         // Key: use translateX to center after scale
         // When scale < 1, canvas shrinks but still at left edge
         // We need to shift it left by half the lost width
-        const lostW = A4_W - (A4_W * scale);
-        canvas.style.transform = `translateX(-${lostW / 2}px) scale(${scale})`;
-        canvas.style.transformOrigin = "top left";
-        canvas.style.marginTop = "0";
+        canvas.style.transform = `scale(${scale})`;
+        canvas.style.transformOrigin = "top left"; canvas.style.marginTop = "0";
         canvas.style.marginBottom = `-${A4_H - scaledH}px`;
         canvas.style.display = "block";
         // Set wrapper height
@@ -3306,4 +3303,5 @@ try {
     </div>
   );
 }
+
 

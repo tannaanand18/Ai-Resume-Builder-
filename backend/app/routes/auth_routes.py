@@ -1,3 +1,6 @@
+﻿import os
+import os
+import os
 from flask import Blueprint, request, jsonify, make_response
 from app.extensions import db, bcrypt, mail
 from app.models.user import User
@@ -255,7 +258,7 @@ def forgot_password():
     user.reset_token_expiry = expiry
     db.session.commit()
 
-    reset_link = f"http://localhost:5173/reset-password/{token}"
+    reset_link = f"{os.getenv('FRONTEND_URL', 'http://localhost:5173')}/reset-password/{token}"
 
     msg = Message(
         subject="Reset Your ResumeAI Password",
@@ -309,3 +312,6 @@ def reset_password(token):
     db.session.commit()
 
     return jsonify({"message": "Password reset successful"}), 200
+
+
+
