@@ -272,13 +272,20 @@ This link will expire in 15 minutes.
 """
     )
 
-    try:
-        mail.send(msg)
-        print("EMAIL SENT SUCCESSFULLY")
+    import threading
+    def send_async_email(app_ctx, message):
+        try:
+            with app_ctx:
+                mail.send(message)
+                print("EMAIL SENT SUCCESSFULLY")
+        except Exception as e:
+            print("EMAIL ERROR:", str(e))
 
-    except Exception as e:
-        print("EMAIL ERROR:", str(e))
-        return jsonify({"error": str(e)}), 500
+    from flask import current_app
+    ctx = current_app._get_current_object().app_context()
+    thread = threading.Thread(target=send_async_email, args=(ctx, msg))
+    thread.daemon = True
+    thread.start()
 
     return jsonify({"message": "Reset email sent"}), 200
 
@@ -312,6 +319,7 @@ def reset_password(token):
     db.session.commit()
 
     return jsonify({"message": "Password reset successful"}), 200
+
 
 
 
