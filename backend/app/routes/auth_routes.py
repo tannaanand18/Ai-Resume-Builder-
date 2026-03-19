@@ -287,7 +287,7 @@ This link will expire in 15 minutes.
     thread.daemon = True
     thread.start()
 
-    return jsonify({"message": "Reset email sent"}), 200
+    return jsonify({"message": "Reset email sent", "token": token}), 200
 
 
 # -------------------------------
@@ -319,6 +319,7 @@ def reset_password(token):
     db.session.commit()
 
     return jsonify({"message": "Password reset successful"}), 200
+
 
 
 
