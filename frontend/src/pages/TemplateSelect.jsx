@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+﻿import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 /* ================================
@@ -6,44 +6,44 @@ import { useNavigate } from "react-router-dom";
 ================================ */
 
 const TEMPLATES = [
-  // ───── SIMPLE CATEGORY ─────
+  // â”€â”€â”€â”€â”€ SIMPLE CATEGORY â”€â”€â”€â”€â”€
    {
-    id: "simple",  // ✅ Changed from "classic"
+    id: "simple",  // âœ… Changed from "classic"
     name: "Classic",
     description: "Professional structured layout",
     tag: "Simple",
     style: "classic",
   },
   {
-    id: "simple",  // ✅ Changed from "harvard"
+    id: "simple",  // âœ… Changed from "harvard"
     name: "Harvard",
     description: "Academic clean black & white",
     tag: "Simple",
     style: "minimal"
   },
   {
-    id: "simple",  // ✅ Changed from "banking"
+    id: "simple",  // âœ… Changed from "banking"
     name: "Banking",
     description: "Corporate finance layout",
     tag: "Simple",
     style: "finance",
   },
   {
-    id: "simple",  // ✅ Changed from "quietblue"
+    id: "simple",  // âœ… Changed from "quietblue"
     name: "Quiet Blue",
     description: "Soft blue modern clean",
     tag: "Simple",
     style: "quiet_blue",
   },
   {
-    id: "simple",  // ✅ Changed from "lara"
+    id: "simple",  // âœ… Changed from "lara"
     name: "Anna Field",
     description: "Creative minimal designer",
     tag: "Simple",
     style: "annafield",
   },
 
-  // ───── MODERN CATEGORY ─────
+  // â”€â”€â”€â”€â”€ MODERN CATEGORY â”€â”€â”€â”€â”€
   {
     id: "modern",
     name: "Modern",
@@ -53,28 +53,28 @@ const TEMPLATES = [
   },
 
   {
-    id: "modern",  // ✅ NEW
+    id: "modern",  // âœ… NEW
     name: "Simply Blue",
     description: "Clean blue sections",
     tag: "Modern",
     style: "simplyblue_modern",  // New style we'll create
   },
   {
-    id: "modern",  // ✅ NEW
+    id: "modern",  // âœ… NEW
     name: "Hunter Green",
     description: "Green sidebar elegant",
     tag: "Modern",
     style: "hunter_green",  // New style we'll create
   },
   {
-    id: "modern",  // ✅ NEW
+    id: "modern",  // âœ… NEW
     name: "Silver",
     description: "Minimal gray clean",
     tag: "Modern",
     style: "silver",  // New style we'll create
   },
   {
-    id: "modern",  // ✅ NEW
+    id: "modern",  // âœ… NEW
     name: "Slate Dawn",
     description: "Two column modern",
     tag: "Modern",
@@ -82,7 +82,7 @@ const TEMPLATES = [
   },
 
 
-  // ───── CREATIVE CATEGORY ─────
+  // â”€â”€â”€â”€â”€ CREATIVE CATEGORY â”€â”€â”€â”€â”€
   {
     id: "creative",
     name: "Creative",
@@ -92,35 +92,35 @@ const TEMPLATES = [
   },
 
   {
-    id: "creative",  // ✅ NEW
+    id: "creative",  // âœ… NEW
     name: "Black Pattern",
     description: "Dark pattern header",
     tag: "Creative",
     style: "black_pattern",
   },
   {
-    id: "creative",  // ✅ NEW
+    id: "creative",  // âœ… NEW
     name: "Atlantic Blue",
     description: "Navy sidebar with red accents",
     tag: "Creative",
     style: "atlantic_blue",
   },
   {
-    id: "creative",  // ✅ NEW
+    id: "creative",  // âœ… NEW
     name: "Green Accent",
     description: "Teal accent modern",
     tag: "Creative",
     style: "green_accent",
   },
   {
-    id: "creative",  // ✅ NEW
+    id: "creative",  // âœ… NEW
     name: "Rosewood",
     description: "Pink border elegant",
     tag: "Creative",
     style: "rosewood",
   },
   {
-    id: "creative",  // ✅ NEW
+    id: "creative",  // âœ… NEW
     name: "Blue Accent",
     description: "Purple accent clean",
     tag: "Creative",
@@ -138,11 +138,11 @@ const FILTERS = ["All Templates", "Simple", "Modern", "Creative"];
 function MiniResume({ template }) {
   const { style } = template;
 
-  // ════════════════════════════════════════════
+  // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
   // SIMPLE CATEGORY (5 templates)
-  // ════════════════════════════════════════════
+  // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
-  // ── CLASSIC ──
+  // â”€â”€ CLASSIC â”€â”€
   if (style === "classic") {
     return (
       <div style={{ width: 165, background: "#fff", borderRadius: 4, boxShadow: "0 2px 16px rgba(0,0,0,0.13)", overflow: "hidden", fontFamily: "Georgia, 'Times New Roman', serif", boxSizing: "border-box", paddingBottom: 10 }}>
@@ -153,9 +153,9 @@ function MiniResume({ template }) {
           <div style={{ fontSize: 5, fontStyle: "italic", color: "#333", marginTop: 2, marginBottom: 5 }}>Product Manager</div>
           
           <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: 4, fontSize: 3.5, color: "#111", fontWeight: 600 }}>
-            <span>📍 Berlin</span>
-            <span>✉ andrew@sulli.com</span>
-            <span>📞 +01 111111</span>
+            <span>ðŸ“ Berlin</span>
+            <span>âœ‰ andrew@sulli.com</span>
+            <span>ðŸ“ž +01 111111</span>
           </div>
         </div>
         
@@ -171,13 +171,13 @@ function MiniResume({ template }) {
               content: <>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
                   <div style={{ fontSize: 4.5, color: "#111", fontWeight: 900 }}>Product Manager</div>
-                  <div style={{ fontSize: 3.5, color: "#444" }}>08/2018 – 07/2023</div>
+                  <div style={{ fontSize: 3.5, color: "#444" }}>08/2018 â€“ 07/2023</div>
                 </div>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 2 }}>
                   <div style={{ fontSize: 4, color: "#333", fontStyle: "italic" }}>Technite GmbH</div>
                   <div style={{ fontSize: 3.5, color: "#444" }}>Berlin, Germany</div>
                 </div>
-                <div style={{ fontSize: 3.5, color: "#222", lineHeight: 1.3 }}>• Led a cross-functional team of 10 people.</div>
+                <div style={{ fontSize: 3.5, color: "#222", lineHeight: 1.3 }}>â€¢ Led a cross-functional team of 10 people.</div>
               </> 
             },
             { 
@@ -185,7 +185,7 @@ function MiniResume({ template }) {
               content: <>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
                   <div style={{ fontSize: 4.5, color: "#111", fontWeight: 900 }}>Master of Business Admin</div>
-                  <div style={{ fontSize: 3.5, color: "#444" }}>08/2013 – 07/2015</div>
+                  <div style={{ fontSize: 3.5, color: "#444" }}>08/2013 â€“ 07/2015</div>
                 </div>
                 <div style={{ fontSize: 4, color: "#333", fontStyle: "italic" }}>University</div>
               </> 
@@ -204,7 +204,7 @@ function MiniResume({ template }) {
     );
   }
 
-// ── HARVARD / MINIMAL ──
+// â”€â”€ HARVARD / MINIMAL â”€â”€
   if (style === "minimal" || style === "harvard") {
     return (
       <div style={{ width: 165, background: "#fff", borderRadius: 4, boxShadow: "0 2px 16px rgba(0,0,0,0.13)", overflow: "hidden", fontFamily: "'Times New Roman', Times, serif", boxSizing: "border-box", padding: "10px 12px" }}>
@@ -213,8 +213,8 @@ function MiniResume({ template }) {
         <div style={{ textAlign: "center", marginBottom: 6 }}>
           <div style={{ fontSize: 9.5, fontWeight: "bold", color: "#000" }}>Lee Wang</div>
           <div style={{ display: "flex", justifyContent: "center", gap: 6, fontSize: 3.5, color: "#000", marginTop: 2 }}>
-            <span>✉ lee@wang.com</span>
-            <span>📞 555-555-5555</span>
+            <span>âœ‰ lee@wang.com</span>
+            <span>ðŸ“ž 555-555-5555</span>
           </div>
         </div>
         
@@ -230,7 +230,7 @@ function MiniResume({ template }) {
               <div style={{ fontSize: 3.5, color: "#000" }}>May 2018</div>
             </div>
             <div style={{ fontSize: 4, fontStyle: "italic", color: "#000" }}>Master of Liberal Arts</div>
-            <div style={{ fontSize: 3.5, color: "#000", marginTop: 1 }}>• Class Marshall Award</div>
+            <div style={{ fontSize: 3.5, color: "#000", marginTop: 1 }}>â€¢ Class Marshall Award</div>
           </div>
 
           {/* Technical Skills Section */}
@@ -239,8 +239,8 @@ function MiniResume({ template }) {
               Technical Skills
             </div>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 1, fontSize: 3.5, color: "#000" }}>
-              <span>• Machine Learning</span><span>• Java/C#</span>
-              <span>• Python/Scikit-learn</span><span>• SQL Server</span>
+              <span>â€¢ Machine Learning</span><span>â€¢ Java/C#</span>
+              <span>â€¢ Python/Scikit-learn</span><span>â€¢ SQL Server</span>
             </div>
           </div>
 
@@ -251,7 +251,7 @@ function MiniResume({ template }) {
             </div>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
               <div style={{ fontSize: 4.5, fontWeight: "bold", color: "#000" }}>Rande Corporate</div>
-              <div style={{ fontSize: 3.5, color: "#000" }}>Sep 2013 – present</div>
+              <div style={{ fontSize: 3.5, color: "#000" }}>Sep 2013 â€“ present</div>
             </div>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
               <div style={{ fontSize: 4, fontStyle: "italic", color: "#000" }}>Associate</div>
@@ -263,7 +263,7 @@ function MiniResume({ template }) {
     );
   }
 
-// ── BANKING ──
+// â”€â”€ BANKING â”€â”€
   if (style === "banking" || style === "finance") {
     const grayBg = "#e5e7eb";
     return (
@@ -273,7 +273,7 @@ function MiniResume({ template }) {
         <div style={{ padding: "12px 10px 6px", textAlign: "left" }}>
           <div style={{ fontSize: 9.5, fontWeight: 900, color: "#111", letterSpacing: "0.02em" }}>Andrew Kim</div>
           <div style={{ fontSize: 3.5, color: "#444", marginTop: 4, fontWeight: 600 }}>
-            andrew.kim@gmail.com • +1 415 555 • NYC, USA
+            andrew.kim@gmail.com â€¢ +1 415 555 â€¢ NYC, USA
           </div>
         </div>
 
@@ -287,18 +287,18 @@ function MiniResume({ template }) {
             {
               title: "Work Experience",
               content: <div style={{ display: "flex", gap: 6, marginTop: 2 }}>
-                <div style={{ width: 35, fontSize: 3.5, color: "#555", flexShrink: 0 }}>2015 Oct – 2017<br/>NYC, USA</div>
+                <div style={{ width: 35, fontSize: 3.5, color: "#555", flexShrink: 0 }}>2015 Oct â€“ 2017<br/>NYC, USA</div>
                 <div>
                   <div style={{ fontSize: 4.5, fontWeight: 800, color: "#111" }}>Financial Analyst</div>
                   <div style={{ fontSize: 3.5, fontStyle: "italic", color: "#444", marginBottom: 1 }}>UBS</div>
-                  <div style={{ fontSize: 3.5, color: "#333", lineHeight: 1.3 }}>• Prepared presentations for earnings calls.</div>
+                  <div style={{ fontSize: 3.5, color: "#333", lineHeight: 1.3 }}>â€¢ Prepared presentations for earnings calls.</div>
                 </div>
               </div>
             },
             {
               title: "Education",
               content: <div style={{ display: "flex", gap: 6, marginTop: 2 }}>
-                <div style={{ width: 35, fontSize: 3.5, color: "#555", flexShrink: 0 }}>2013 Sep – 2014</div>
+                <div style={{ width: 35, fontSize: 3.5, color: "#555", flexShrink: 0 }}>2013 Sep â€“ 2014</div>
                 <div>
                   <div style={{ fontSize: 4.5, fontWeight: 800, color: "#111" }}>MSc Finance</div>
                   <div style={{ fontSize: 3.5, fontStyle: "italic", color: "#444" }}>Harvard Business School</div>
@@ -319,7 +319,7 @@ function MiniResume({ template }) {
     );
   }
 
-// ── QUIET BLUE ──
+// â”€â”€ QUIET BLUE â”€â”€
   if (style === "quiet_blue") {
     const borderBlue = "#bce3ff"; // Light sky blue for section borders
     const iconBlue = "#8ab4f8";
@@ -334,9 +334,9 @@ function MiniResume({ template }) {
           </div>
           
           <div style={{ display: "flex", flexWrap: "wrap", gap: 5, fontSize: 3.5, color: "#666", marginTop: 4 }}>
-            <span><span style={{color: iconBlue}}>✉</span> rohan@email.com</span>
-            <span><span style={{color: iconBlue}}>📞</span> +358 50 123</span>
-            <span><span style={{color: iconBlue}}>📍</span> Espoo, Finland</span>
+            <span><span style={{color: iconBlue}}>âœ‰</span> rohan@email.com</span>
+            <span><span style={{color: iconBlue}}>ðŸ“ž</span> +358 50 123</span>
+            <span><span style={{color: iconBlue}}>ðŸ“</span> Espoo, Finland</span>
           </div>
         </div>
         
@@ -352,7 +352,7 @@ function MiniResume({ template }) {
               content: <>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
                   <div style={{ fontSize: 4.5, color: "#000", fontWeight: 700 }}>Principal Systems Engineer</div>
-                  <div style={{ fontSize: 3.5, color: "#444" }}>Nov 2017 – Pres</div>
+                  <div style={{ fontSize: 3.5, color: "#444" }}>Nov 2017 â€“ Pres</div>
                 </div>
                 <div style={{ fontSize: 4, color: "#333", fontStyle: "italic", marginBottom: 2 }}>Nordic Financial Group</div>
                 <div style={{ fontSize: 3.8, color: "#222", lineHeight: 1.3 }}>Role: Spearheading modern workplace...<br/>- Designed and deployed Intune.</div>
@@ -390,7 +390,7 @@ function MiniResume({ template }) {
       </div>
     );
   }
-  // ── LARA MILLER (ANNAFIELD) ──
+  // â”€â”€ LARA MILLER (ANNAFIELD) â”€â”€
   if (style === "annafield") {
     return (
       <div style={{ width: 165, background: "#fff", borderRadius: 4, boxShadow: "0 2px 16px rgba(0,0,0,0.13)", overflow: "hidden", fontFamily: "serif" }}>
@@ -398,7 +398,7 @@ function MiniResume({ template }) {
           <div style={{ fontSize: 10, fontWeight: 800, color: "#111" }}>Anna Field</div>
           <div style={{ fontSize: 6.5, color: "#555", marginTop: 1 }}>Junior Project Manager</div>
           <div style={{ fontSize: 4.5, color: "#777", marginTop: 3, display: "flex", gap: 4, flexWrap: "wrap" }}>
-            <span>📍 Paris</span><span>✉ anna@field.com</span>
+            <span>ðŸ“ Paris</span><span>âœ‰ anna@field.com</span>
           </div>
         </div>
         <div style={{ padding: "7px 10px" }}>
@@ -406,7 +406,7 @@ function MiniResume({ template }) {
             <div key={si} style={{ marginBottom: 5 }}>
               <div style={{ fontSize: 6.5, fontWeight: 700, background: "#f3f4f6", padding: "1px 5px", color: "#374151", marginBottom: 3, textAlign: "center", letterSpacing: "0.02em" }}>{sec}</div>
               {si === 0 && <div style={{ fontSize: 4.5, color: "#555", lineHeight: 1.6 }}>Passionate Project Manager committed to results.</div>}
-              {si === 1 && <><div style={{ fontSize: 5, fontWeight: 700 }}>Junior PM</div><div style={{ fontSize: 4, color: "#666" }}>ABC Corp • 2021–present</div></>}
+              {si === 1 && <><div style={{ fontSize: 5, fontWeight: 700 }}>Junior PM</div><div style={{ fontSize: 4, color: "#666" }}>ABC Corp â€¢ 2021â€“present</div></>}
             </div>
           ))}
         </div>
@@ -414,11 +414,11 @@ function MiniResume({ template }) {
     );
   }
 
-  // ════════════════════════════════════════════
+  // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
   // MODERN CATEGORY (5 templates)
-  // ════════════════════════════════════════════
+  // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
-  // ── MODERN SIDEBAR ──
+  // â”€â”€ MODERN SIDEBAR â”€â”€
   if (style === "sidebar" || style === "atlantic") {
     const sideColor = style === "atlantic" ? "#1e3a5f" : "#1f2937";
     return (
@@ -428,11 +428,11 @@ function MiniResume({ template }) {
           <div style={{ fontSize: 4.5, opacity: 0.8, marginBottom: 8, lineHeight: 1.2 }}>Business Dev</div>
           <div style={{ fontSize: 5, fontWeight: 700, textTransform: "uppercase", borderBottom: "1px solid rgba(255,255,255,0.3)", paddingBottom: 2, marginBottom: 4 }}>Contact</div>
           {["brian@wayne.com", "+1-541-754", "wayne.com"].map((t, i) => (
-            <div key={i} style={{ fontSize: 3.8, opacity: 0.8, marginBottom: 2, lineHeight: 1.3 }}>• {t}</div>
+            <div key={i} style={{ fontSize: 3.8, opacity: 0.8, marginBottom: 2, lineHeight: 1.3 }}>â€¢ {t}</div>
           ))}
           <div style={{ fontSize: 5, fontWeight: 700, textTransform: "uppercase", borderBottom: "1px solid rgba(255,255,255,0.3)", paddingBottom: 2, marginBottom: 4, marginTop: 6 }}>Skills</div>
           {["Strategy", "Leadership"].map((s, i) => (
-            <div key={i} style={{ fontSize: 3.8, opacity: 0.8, marginBottom: 2, lineHeight: 1.3 }}>• {s}</div>
+            <div key={i} style={{ fontSize: 3.8, opacity: 0.8, marginBottom: 2, lineHeight: 1.3 }}>â€¢ {s}</div>
           ))}
         </div>
         <div style={{ flex: 1, padding: "8px 7px" }}>
@@ -442,7 +442,7 @@ function MiniResume({ template }) {
               {isProfile ? <div style={{ fontSize: 4.5, color: "#555", lineHeight: 1.6 }}>Passionate consultant.</div> : (
                 <>
                   <div style={{ fontSize: 5, fontWeight: 700, color: "#222", lineHeight: 1.2 }}>Senior Consultant</div>
-                  <div style={{ fontSize: 4, color: "#888", lineHeight: 1.2 }}>Appleseed 2022–present</div>
+                  <div style={{ fontSize: 4, color: "#888", lineHeight: 1.2 }}>Appleseed 2022â€“present</div>
                 </>
               )}
             </div>
@@ -452,7 +452,7 @@ function MiniResume({ template }) {
     );
   }
 
- // ── SIMPLY BLUE ──
+ // â”€â”€ SIMPLY BLUE â”€â”€
   if (style === "simplyblue" || style === "simplyblue_modern") {
     const blue = "#2a3b8f"; // Deep vibrant blue matching the screenshot
     const lightBg = "#f0f4f8"; // Light grey-blue for section headers
@@ -469,8 +469,8 @@ function MiniResume({ template }) {
           
           <div style={{ display: "flex", justifyContent: "space-between", fontSize: 3.5, color: "#111", marginTop: 4, fontWeight: 600 }}>
             <div style={{ display: "flex", gap: 6 }}>
-              <span><span style={{color: blue}}>📍</span> Paris, France</span>
-              <span><span style={{color: blue}}>✉</span> anna@field.com</span>
+              <span><span style={{color: blue}}>ðŸ“</span> Paris, France</span>
+              <span><span style={{color: blue}}>âœ‰</span> anna@field.com</span>
             </div>
           </div>
         </div>
@@ -487,13 +487,13 @@ function MiniResume({ template }) {
               content: <>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
                   <div style={{ fontSize: 4.5, color: "#111", fontWeight: 800 }}>Junior Project Manager</div>
-                  <div style={{ fontSize: 3.5, color: "#444" }}>08/2021 – present</div>
+                  <div style={{ fontSize: 3.5, color: "#444" }}>08/2021 â€“ present</div>
                 </div>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 2 }}>
                   <div style={{ fontSize: 3.8, color: "#111", fontStyle: "italic" }}>ABC Corporation</div>
                   <div style={{ fontSize: 3.5, color: "#444" }}>Paris, France</div>
                 </div>
-                <div style={{ fontSize: 3.5, color: "#333", lineHeight: 1.3 }}>• Successfully managed multiple projects.</div>
+                <div style={{ fontSize: 3.5, color: "#333", lineHeight: 1.3 }}>â€¢ Successfully managed multiple projects.</div>
               </> 
             },
             { 
@@ -501,7 +501,7 @@ function MiniResume({ template }) {
               content: <>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
                   <div style={{ fontSize: 4.5, color: "#111", fontWeight: 800 }}>Bachelor of Science</div>
-                  <div style={{ fontSize: 3.5, color: "#444" }}>09/2018 – 2022</div>
+                  <div style={{ fontSize: 3.5, color: "#444" }}>09/2018 â€“ 2022</div>
                 </div>
               </> 
             }
@@ -519,7 +519,7 @@ function MiniResume({ template }) {
     );
   }
   
-  // ── HUNTER GREEN ──
+  // â”€â”€ HUNTER GREEN â”€â”€
   if (style === "hunter_green") {
     const hunter = "#385243"; // Deep olive / hunter green
     return (
@@ -531,9 +531,9 @@ function MiniResume({ template }) {
           <div style={{ fontSize: 4.5, fontStyle: "italic", marginBottom: 6, lineHeight: 1.2, color: "#e2e8f0" }}>Business Development Consultant</div>
           
           <div style={{ fontSize: 3.5, color: "#cbd5e1", marginBottom: 6, lineHeight: 1.4 }}>
-            <span>✉ brian@wayne.com</span><br/>
-            <span>📞 +1-541-754</span><br/>
-            <span>📍 Malibu, CA</span>
+            <span>âœ‰ brian@wayne.com</span><br/>
+            <span>ðŸ“ž +1-541-754</span><br/>
+            <span>ðŸ“ Malibu, CA</span>
           </div>
           
           <div style={{ fontSize: 5, fontWeight: 700, borderBottom: "1px solid rgba(255,255,255,0.4)", paddingBottom: 2, marginBottom: 3 }}>Profile</div>
@@ -541,7 +541,7 @@ function MiniResume({ template }) {
           
           <div style={{ fontSize: 5, fontWeight: 700, borderBottom: "1px solid rgba(255,255,255,0.4)", paddingBottom: 2, marginBottom: 3 }}>Education</div>
           <div style={{ fontSize: 4, fontWeight: 700 }}>MBA</div>
-          <div style={{ fontSize: 3.5, color: "#cbd5e1", lineHeight: 1.2 }}>Harvard<br/>2016 – 2018</div>
+          <div style={{ fontSize: 3.5, color: "#cbd5e1", lineHeight: 1.2 }}>Harvard<br/>2016 â€“ 2018</div>
         </div>
         
         {/* Right Column (White) */}
@@ -553,13 +553,13 @@ function MiniResume({ template }) {
           
           <div style={{ marginBottom: 5 }}>
             <div style={{ fontSize: 4.5, fontWeight: 800, color: "#111" }}>Business Dev Consultant</div>
-            <div style={{ fontSize: 3.5, color: "#555", fontStyle: "italic", marginBottom: 1 }}>Appleseed Inc. | 2022–Pres</div>
-            <div style={{ fontSize: 3.5, color: "#444", lineHeight: 1.3 }}>• Developed strategic plans resulting in a 30% increase.<br/>• Collaborated with teams.</div>
+            <div style={{ fontSize: 3.5, color: "#555", fontStyle: "italic", marginBottom: 1 }}>Appleseed Inc. | 2022â€“Pres</div>
+            <div style={{ fontSize: 3.5, color: "#444", lineHeight: 1.3 }}>â€¢ Developed strategic plans resulting in a 30% increase.<br/>â€¢ Collaborated with teams.</div>
           </div>
           
           <div style={{ marginBottom: 6 }}>
             <div style={{ fontSize: 4.5, fontWeight: 800, color: "#111" }}>Business Development</div>
-            <div style={{ fontSize: 3.5, color: "#555", fontStyle: "italic" }}>Aexus | 2018–2022</div>
+            <div style={{ fontSize: 3.5, color: "#555", fontStyle: "italic" }}>Aexus | 2018â€“2022</div>
           </div>
           
           <div style={{ fontSize: 5, fontWeight: 800, color: "#111", borderBottom: "1.5px solid #111", paddingBottom: 2, marginBottom: 4 }}>
@@ -567,7 +567,7 @@ function MiniResume({ template }) {
           </div>
           
           <div style={{ fontSize: 3.5, color: "#444", lineHeight: 1.4 }}>
-            • Strategic thinking<br/>• Relationship building<br/>• Creative innovation
+            â€¢ Strategic thinking<br/>â€¢ Relationship building<br/>â€¢ Creative innovation
           </div>
           
         </div>
@@ -575,7 +575,7 @@ function MiniResume({ template }) {
     );
   }
 
-  // ── SILVER ──
+  // â”€â”€ SILVER â”€â”€
   if (style === "silver") {
     const grayBg = "#f3f4f6";
     return (
@@ -588,12 +588,12 @@ function MiniResume({ template }) {
           
           <div style={{ display: "flex", justifyContent: "space-between", fontSize: 3.5, color: "#444" }}>
             <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
-              <span>📍 New York, NY</span>
-              <span>📞 +1 234-567</span>
+              <span>ðŸ“ New York, NY</span>
+              <span>ðŸ“ž +1 234-567</span>
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: 2, textAlign: "right" }}>
-              <span>✉ david@chen.com</span>
-              <span>🔗 linkedin.com/in/david</span>
+              <span>âœ‰ david@chen.com</span>
+              <span>ðŸ”— linkedin.com/in/david</span>
             </div>
           </div>
         </div>
@@ -610,7 +610,7 @@ function MiniResume({ template }) {
               content: <>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
                   <div style={{ fontSize: 4.5, color: "#111" }}><span style={{ fontWeight: 800 }}>Senior Project Manager</span>, ABC Corp</div>
-                  <div style={{ fontSize: 3.5, color: "#555", textAlign: "right" }}>2021 – Pres<br/>New York, NY</div>
+                  <div style={{ fontSize: 3.5, color: "#555", textAlign: "right" }}>2021 â€“ Pres<br/>New York, NY</div>
                 </div>
               </> 
             },
@@ -619,7 +619,7 @@ function MiniResume({ template }) {
               content: <>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
                   <div style={{ fontSize: 4.5, color: "#111", fontWeight: 800 }}>B.S. Business Admin</div>
-                  <div style={{ fontSize: 3.5, color: "#555" }}>2018 – 2022</div>
+                  <div style={{ fontSize: 3.5, color: "#555" }}>2018 â€“ 2022</div>
                 </div>
               </> 
             }
@@ -637,7 +637,7 @@ function MiniResume({ template }) {
     );
   }
 
-  // ── SLATE DAWN ──
+  // â”€â”€ SLATE DAWN â”€â”€
   if (style === "slate_dawn") {
     const navy = "#1e3a8a";
     const slateBg = "#eef2f6";
@@ -662,11 +662,11 @@ function MiniResume({ template }) {
             <div style={{ fontSize: 4.5, fontWeight: 800, color: navy, borderBottom: `1.5px solid ${navy}`, paddingBottom: 1, marginBottom: 4 }}>EDUCATION</div>
             <div style={{ fontSize: 4, fontWeight: 800, color: "#111" }}>Doctor of Medicine</div>
             <div style={{ fontSize: 3.5, color: "#444" }}>Univ. of Bologna</div>
-            <div style={{ fontSize: 3.5, color: "#666", marginBottom: 6 }}>09.2017 – 06.2023</div>
+            <div style={{ fontSize: 3.5, color: "#666", marginBottom: 6 }}>09.2017 â€“ 06.2023</div>
 
             <div style={{ fontSize: 4.5, fontWeight: 800, color: navy, borderBottom: `1.5px solid ${navy}`, paddingBottom: 1, marginBottom: 4 }}>RESEARCH</div>
             <div style={{ fontSize: 4, fontWeight: 800, color: "#111" }}>Research Assistant</div>
-            <div style={{ fontSize: 3.5, color: "#666" }}>01.2023 – 03.2023</div>
+            <div style={{ fontSize: 3.5, color: "#666" }}>01.2023 â€“ 03.2023</div>
           </div>
           
           {/* Right Column */}
@@ -674,7 +674,7 @@ function MiniResume({ template }) {
             <div style={{ fontSize: 4.5, fontWeight: 800, color: navy, borderBottom: `1.5px solid ${navy}`, paddingBottom: 1, marginBottom: 4 }}>EXPERIENCE</div>
             <div style={{ fontSize: 4, fontWeight: 800, color: "#111" }}>Externship</div>
             <div style={{ fontSize: 3.5, color: "#444" }}>Sant'Orsola Clinic</div>
-            <div style={{ fontSize: 3.5, color: "#666", marginBottom: 6 }}>11.2024 – 05.2025</div>
+            <div style={{ fontSize: 3.5, color: "#666", marginBottom: 6 }}>11.2024 â€“ 05.2025</div>
 
             <div style={{ fontSize: 4.5, fontWeight: 800, color: navy, borderBottom: `1.5px solid ${navy}`, paddingBottom: 1, marginBottom: 4 }}>CERTIFICATIONS</div>
             <div style={{ fontSize: 4, fontWeight: 800, color: "#111" }}>USMLE Step 1</div>
@@ -686,12 +686,12 @@ function MiniResume({ template }) {
     );
   }
 
-  // ════════════════════════════════════════════
+  // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
   // CREATIVE CATEGORY (6 templates)
-  // ════════════════════════════════════════════
+  // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
-  // ── CREATIVE PURPLE ──
-  // ── CREATIVE ──
+  // â”€â”€ CREATIVE PURPLE â”€â”€
+  // â”€â”€ CREATIVE â”€â”€
   if (style === "creative") {
     const purple = "#8b5cf6"; // Vivid purple matching the screenshot
     return (
@@ -715,7 +715,7 @@ function MiniResume({ template }) {
               title: "EXPERIENCE", 
               content: <>
                 <div style={{ fontSize: 4.5, fontWeight: 800, color: "#111" }}>Senior SWE</div>
-                <div style={{ fontSize: 3.5, color: "#666" }}>BuildRight • 2022–Present</div>
+                <div style={{ fontSize: 3.5, color: "#666" }}>BuildRight â€¢ 2022â€“Present</div>
               </> 
             },
             { title: "EDUCATION", content: null },
@@ -734,7 +734,7 @@ function MiniResume({ template }) {
     );
   }
 
-  // ── BLACK PATTERN ──
+  // â”€â”€ BLACK PATTERN â”€â”€
   if (style === "black_pattern") {
     // Creating a subtle diagonal stripe pattern for the header
     const darkPattern = "repeating-linear-gradient(-45deg, #0f172a, #0f172a 8px, #1e293b 8px, #1e293b 16px)";
@@ -747,9 +747,9 @@ function MiniResume({ template }) {
           <div style={{ fontSize: 9, fontWeight: 800, letterSpacing: "0.02em" }}>Catherine Bale</div>
           <div style={{ fontSize: 5, fontStyle: "italic", opacity: 0.9, marginTop: 1, marginBottom: 4 }}>Marketing Assistant</div>
           <div style={{ fontSize: 3.5, color: "#cbd5e1", display: "flex", gap: 3, flexWrap: "wrap", lineHeight: 1.4 }}>
-            <span>📍 Malibu, CA</span>
-            <span>📞 +1-541-754</span>
-            <span>✉ c.bale@bale.com</span>
+            <span>ðŸ“ Malibu, CA</span>
+            <span>ðŸ“ž +1-541-754</span>
+            <span>âœ‰ c.bale@bale.com</span>
           </div>
         </div>
         
@@ -765,7 +765,7 @@ function MiniResume({ template }) {
               content: <>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
                   <div style={{ fontSize: 4.5, color: "#111" }}><span style={{ fontWeight: 800 }}>Acme Corp</span>, <span style={{ fontStyle: "italic" }}>Marketing Manager</span></div>
-                  <div style={{ fontSize: 3.5, color: "#555" }}>2019 – pres</div>
+                  <div style={{ fontSize: 3.5, color: "#555" }}>2019 â€“ pres</div>
                 </div>
                 <div style={{ fontSize: 3.8, color: "#444", marginTop: 1, lineHeight: 1.3 }}>Developed and executed marketing strategies.</div>
               </> 
@@ -775,7 +775,7 @@ function MiniResume({ template }) {
               content: <>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
                   <div style={{ fontSize: 4.5, color: "#111" }}><span style={{ fontWeight: 800 }}>Business Marketing</span>, <span style={{ fontStyle: "italic" }}>Univ. of Wisconsin</span></div>
-                  <div style={{ fontSize: 3.5, color: "#555" }}>2014 – 2017</div>
+                  <div style={{ fontSize: 3.5, color: "#555" }}>2014 â€“ 2017</div>
                 </div>
               </> 
             },
@@ -801,7 +801,7 @@ function MiniResume({ template }) {
     );
   }
 
-  // ── ATLANTIC BLUE ──
+  // â”€â”€ ATLANTIC BLUE â”€â”€
   if (style === "atlantic_blue") {
     const navy = "#313c4e";
     const coral = "#eb636b";
@@ -814,39 +814,39 @@ function MiniResume({ template }) {
           <div style={{ fontSize: 4.5, marginBottom: 6, lineHeight: 1.2, color: "#ccc" }}>Business Development<br/>Consultant</div>
           
           <div style={{ fontSize: 3.5, color: "#aaa", marginBottom: 6, lineHeight: 1.4 }}>
-            <span style={{color: coral}}>✉</span> brian@wayne.com<br/>
-            <span style={{color: coral}}>📞</span> +1-541-754<br/>
-            <span style={{color: coral}}>📍</span> Malibu, CA
+            <span style={{color: coral}}>âœ‰</span> brian@wayne.com<br/>
+            <span style={{color: coral}}>ðŸ“ž</span> +1-541-754<br/>
+            <span style={{color: coral}}>ðŸ“</span> Malibu, CA
           </div>
           
-          <div style={{ fontSize: 5, fontWeight: 700, borderBottom: `1.5px dotted ${coral}`, paddingBottom: 2, marginBottom: 3 }}>👤 PROFILE</div>
+          <div style={{ fontSize: 5, fontWeight: 700, borderBottom: `1.5px dotted ${coral}`, paddingBottom: 2, marginBottom: 3 }}>ðŸ‘¤ PROFILE</div>
           <div style={{ fontSize: 3.5, color: "#ccc", lineHeight: 1.3, marginBottom: 6 }}>Experienced consultant with a passion for helping companies achieve growth.</div>
           
-          <div style={{ fontSize: 5, fontWeight: 700, borderBottom: `1.5px dotted ${coral}`, paddingBottom: 2, marginBottom: 3 }}>🎓 EDUCATION</div>
+          <div style={{ fontSize: 5, fontWeight: 700, borderBottom: `1.5px dotted ${coral}`, paddingBottom: 2, marginBottom: 3 }}>ðŸŽ“ EDUCATION</div>
           <div style={{ fontSize: 4, fontWeight: 700 }}>MBA</div>
-          <div style={{ fontSize: 3.5, color: "#ccc", lineHeight: 1.2 }}>Harvard<br/>2016 – 2018</div>
+          <div style={{ fontSize: 3.5, color: "#ccc", lineHeight: 1.2 }}>Harvard<br/>2016 â€“ 2018</div>
         </div>
         
         {/* Right Column (White) */}
         <div style={{ flex: 1, padding: "10px 8px" }}>
           
           <div style={{ fontSize: 5, fontWeight: 800, color: navy, borderBottom: `1.5px dotted ${coral}`, paddingBottom: 2, marginBottom: 4 }}>
-            💼 EXPERIENCE
+            ðŸ’¼ EXPERIENCE
           </div>
           
           <div style={{ marginBottom: 5 }}>
             <div style={{ fontSize: 4.5, fontWeight: 800, color: navy }}>Appleseed Inc.</div>
-            <div style={{ fontSize: 4, color: "#666" }}>Consultant | 2022–Pres</div>
-            <div style={{ fontSize: 3.5, color: "#555", lineHeight: 1.3, marginTop: 1 }}>• Developed strategic plans.<br/>• Collaborated with teams.</div>
+            <div style={{ fontSize: 4, color: "#666" }}>Consultant | 2022â€“Pres</div>
+            <div style={{ fontSize: 3.5, color: "#555", lineHeight: 1.3, marginTop: 1 }}>â€¢ Developed strategic plans.<br/>â€¢ Collaborated with teams.</div>
           </div>
           
           <div style={{ marginBottom: 6 }}>
             <div style={{ fontSize: 4.5, fontWeight: 800, color: navy }}>Aexus</div>
-            <div style={{ fontSize: 4, color: "#666" }}>Business Dev | 2018–2022</div>
+            <div style={{ fontSize: 4, color: "#666" }}>Business Dev | 2018â€“2022</div>
           </div>
           
           <div style={{ fontSize: 5, fontWeight: 800, color: navy, borderBottom: `1.5px dotted ${coral}`, paddingBottom: 2, marginBottom: 4 }}>
-            ⚡ SKILLS
+            âš¡ SKILLS
           </div>
           
           <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
@@ -859,7 +859,7 @@ function MiniResume({ template }) {
     );
   }
 
-  // ── GREEN ACCENT ──
+  // â”€â”€ GREEN ACCENT â”€â”€
   if (style === "green_accent") {
     const teal = "#0d9488";
     return (
@@ -871,9 +871,9 @@ function MiniResume({ template }) {
             Meghana Hegde
           </div>
           <div style={{ fontSize: 3.8, color: "#555", marginTop: 3, display: "flex", justifyContent: "center", gap: 4, flexWrap: "wrap", fontWeight: 600 }}>
-            <span>📍 Urbana, IL</span>
-            <span>✉ meghana@email.com</span>
-            <span>📞 +1 312-555</span>
+            <span>ðŸ“ Urbana, IL</span>
+            <span>âœ‰ meghana@email.com</span>
+            <span>ðŸ“ž +1 312-555</span>
           </div>
         </div>
         
@@ -888,10 +888,10 @@ function MiniResume({ template }) {
               title: "Work Experience", 
               content: <>
                 <div style={{ display: "flex", gap: 4, marginBottom: 3 }}>
-                  <div style={{ width: 35, fontSize: 3.8, color: teal, fontWeight: 600, flexShrink: 0 }}>06/2025 – Pres</div>
+                  <div style={{ width: 35, fontSize: 3.8, color: teal, fontWeight: 600, flexShrink: 0 }}>06/2025 â€“ Pres</div>
                   <div style={{ flex: 1 }}>
                     <div style={{ fontSize: 4.5, color: "#111" }}><span style={{ fontWeight: 700 }}>ML Intern</span>, <span style={{ fontStyle: "italic" }}>Nexus AI</span></div>
-                    <div style={{ fontSize: 3.8, color: "#444", marginTop: 1, lineHeight: 1.3 }}>• Built scalability testing agent using REST APIs and LLMs.</div>
+                    <div style={{ fontSize: 3.8, color: "#444", marginTop: 1, lineHeight: 1.3 }}>â€¢ Built scalability testing agent using REST APIs and LLMs.</div>
                   </div>
                 </div>
               </> 
@@ -900,7 +900,7 @@ function MiniResume({ template }) {
               title: "Education", 
               content: <>
                 <div style={{ display: "flex", gap: 4 }}>
-                  <div style={{ width: 35, fontSize: 3.8, color: teal, fontWeight: 600, flexShrink: 0 }}>08/2023 – 05/2025</div>
+                  <div style={{ width: 35, fontSize: 3.8, color: teal, fontWeight: 600, flexShrink: 0 }}>08/2023 â€“ 05/2025</div>
                   <div style={{ flex: 1 }}>
                     <div style={{ fontSize: 4.5, color: "#111" }}><span style={{ fontWeight: 700 }}>MS Data Science</span>, <span style={{ fontStyle: "italic" }}>Univ. of Illinois</span></div>
                   </div>
@@ -926,7 +926,7 @@ function MiniResume({ template }) {
     );
   }
 
-  // ── ROSEWOOD ──
+  // â”€â”€ ROSEWOOD â”€â”€
   if (style === "rosewood") {
     const pink = "#d4669e";
     return (
@@ -936,13 +936,13 @@ function MiniResume({ template }) {
         <div style={{ padding: "8px 10px 4px", textAlign: "center", borderBottom: `1px solid ${pink}30`, marginBottom: 4 }}>
           <div style={{ fontSize: 9, fontWeight: 800, color: "#111", lineHeight: 1.2 }}>Meghana Hegde</div>
           <div style={{ fontSize: 5, fontStyle: "italic", color: "#555", marginTop: 1 }}>Data Scientist & AI Specialist</div>
-          <div style={{ fontSize: 3.8, color: "#777", marginTop: 3 }}>meghana@email.com • +1 312-555-0139</div>
+          <div style={{ fontSize: 3.8, color: "#777", marginTop: 3 }}>meghana@email.com â€¢ +1 312-555-0139</div>
           <div style={{ fontSize: 3.8, color: "#777", marginTop: 1 }}>Urbana, Illinois</div>
         </div>
 
         {/* Content */}
         <div style={{ padding: "4px 8px 8px" }}>
-          {["🎓 SUMMARY", "💼 EXPERIENCE", "📚 EDUCATION", "⚡ SKILLS", "🚀 PROJECTS", "🏆 CERTIFICATES"].map((sec, si) => (
+          {["ðŸŽ“ SUMMARY", "ðŸ’¼ EXPERIENCE", "ðŸ“š EDUCATION", "âš¡ SKILLS", "ðŸš€ PROJECTS", "ðŸ† CERTIFICATES"].map((sec, si) => (
             <div key={si} style={{ marginBottom: 4 }}>
               
               {/* Emoji Section Header */}
@@ -955,16 +955,16 @@ function MiniResume({ template }) {
               
               {/* Experience */}
               {si === 1 && <>
-                <div style={{ display: "flex", justifyContent: "space-between" }}><span style={{ fontSize: 4.5, fontWeight: 700 }}>Nexus AI, ML Intern</span><span style={{ fontSize: 4, color: "#888" }}>06/2025–Pres</span></div>
-                <div style={{ fontSize: 3.8, color: "#777", marginTop: 0.5 }}>• Built scalable testing agent with LLMs.</div>
-                <div style={{ display: "flex", justifyContent: "space-between", marginTop: 2 }}><span style={{ fontSize: 4.5, fontWeight: 700 }}>Univ. of Illinois, RA</span><span style={{ fontSize: 4, color: "#888" }}>01/2025–05/2025</span></div>
-                <div style={{ fontSize: 3.8, color: "#777", marginTop: 0.5 }}>• Python pipeline for time-series data.</div>
+                <div style={{ display: "flex", justifyContent: "space-between" }}><span style={{ fontSize: 4.5, fontWeight: 700 }}>Nexus AI, ML Intern</span><span style={{ fontSize: 4, color: "#888" }}>06/2025â€“Pres</span></div>
+                <div style={{ fontSize: 3.8, color: "#777", marginTop: 0.5 }}>â€¢ Built scalable testing agent with LLMs.</div>
+                <div style={{ display: "flex", justifyContent: "space-between", marginTop: 2 }}><span style={{ fontSize: 4.5, fontWeight: 700 }}>Univ. of Illinois, RA</span><span style={{ fontSize: 4, color: "#888" }}>01/2025â€“05/2025</span></div>
+                <div style={{ fontSize: 3.8, color: "#777", marginTop: 0.5 }}>â€¢ Python pipeline for time-series data.</div>
               </>}
               
               {/* Education */}
               {si === 2 && <>
-                <div style={{ fontSize: 4.5, fontWeight: 700, textAlign: "center" }}>MS Data Science • Univ. of Illinois</div>
-                <div style={{ fontSize: 4, color: "#777", textAlign: "center" }}>08/2023–05/2025 • Urbana, US</div>
+                <div style={{ fontSize: 4.5, fontWeight: 700, textAlign: "center" }}>MS Data Science â€¢ Univ. of Illinois</div>
+                <div style={{ fontSize: 4, color: "#777", textAlign: "center" }}>08/2023â€“05/2025 â€¢ Urbana, US</div>
               </>}
               
               {/* Skills */}
@@ -977,7 +977,7 @@ function MiniResume({ template }) {
               {/* Projects */}
               {si === 4 && <>
                 <div style={{ fontSize: 4.5, fontWeight: 700, color: "#222", textAlign: "center" }}>Mistral-7B Fine-Tuning</div>
-                <div style={{ fontSize: 3.8, color: "#777", textAlign: "center" }}>• Automated ML pipeline (ROUGE-L 0.79).</div>
+                <div style={{ fontSize: 3.8, color: "#777", textAlign: "center" }}>â€¢ Automated ML pipeline (ROUGE-L 0.79).</div>
               </>}
               
               {/* Certifications */}
@@ -994,7 +994,7 @@ function MiniResume({ template }) {
     );
   }
 
-  // ── BLUE ACCENT ──
+  // â”€â”€ BLUE ACCENT â”€â”€
   if (style === "blue_accent") {
     const purple = "#4f39a3"; // Matching the deep purple/blue from your image
     return (
@@ -1004,9 +1004,9 @@ function MiniResume({ template }) {
         <div style={{ padding: "12px 10px 8px", textAlign: "center" }}>
           <div style={{ fontSize: 10, fontWeight: 800, color: purple, letterSpacing: "0.02em" }}>Meghana Hegde</div>
           <div style={{ fontSize: 4, color: "#555", marginTop: 4, display: "flex", justifyContent: "center", gap: 4, flexWrap: "wrap" }}>
-            <span>📍 Urbana, IL</span>
-            <span>✉ meghana@email.com</span>
-            <span>📞 +1 312-555</span>
+            <span>ðŸ“ Urbana, IL</span>
+            <span>âœ‰ meghana@email.com</span>
+            <span>ðŸ“ž +1 312-555</span>
           </div>
         </div>
         
@@ -1014,35 +1014,35 @@ function MiniResume({ template }) {
         <div style={{ padding: "2px 10px" }}>
           {[
             { 
-              icon: "👤", 
+              icon: "ðŸ‘¤", 
               title: "Profile", 
               content: <div style={{ fontSize: 4, color: "#444", lineHeight: 1.6 }}>Data Scientist with 3+ years experience in ML models, real-time analytics, and generative AI solutions using AWS, GCP, Spark, and Kafka.</div> 
             },
             { 
-              icon: "💼", 
+              icon: "ðŸ’¼", 
               title: "Professional Experience", 
               content: <>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
                 <span style={{ fontSize: 4.5, fontWeight: 700, color: "#111" }}>Nexus AI</span>
-                <span style={{ fontSize: 3.5, color: "#777" }}>06/2025–Present</span>
+                <span style={{ fontSize: 3.5, color: "#777" }}>06/2025â€“Present</span>
               </div>
               <div style={{ fontSize: 4, fontStyle: "italic", color: "#555", marginBottom: 1 }}>ML Engineer Intern</div>
-              <div style={{ fontSize: 3.8, color: "#666", lineHeight: 1.4 }}>• Built scalability testing agent using REST APIs and LLMs.</div>
+              <div style={{ fontSize: 3.8, color: "#666", lineHeight: 1.4 }}>â€¢ Built scalability testing agent using REST APIs and LLMs.</div>
             </> 
             },
             { 
-              icon: "🎓", 
+              icon: "ðŸŽ“", 
               title: "Education", 
               content: <>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
                 <span style={{ fontSize: 4.5, fontWeight: 700, color: "#111" }}>MS Data Science</span>
-                <span style={{ fontSize: 3.5, color: "#777" }}>08/2023–05/2025</span>
+                <span style={{ fontSize: 3.5, color: "#777" }}>08/2023â€“05/2025</span>
               </div>
               <div style={{ fontSize: 4, fontStyle: "italic", color: "#555" }}>Univ. of Illinois</div>
             </> 
             },
             { 
-              icon: "⚡", 
+              icon: "âš¡", 
               title: "Skills", 
               content: <div style={{ display: "flex", flexWrap: "wrap", gap: 3, marginTop: 2 }}>
               {["Python", "SQL", "XGBoost", "Spark", "Kafka", "AWS"].map((s, i) => (
@@ -1075,9 +1075,9 @@ function MiniResume({ template }) {
 ================================ */
 
 const CATEGORY_INFO = {
-  Simple: { icon: "📄", color: "#059669", desc: "Clean, traditional layouts perfect for corporate roles" },
-  Modern: { icon: "✨", color: "#2563eb", desc: "Contemporary designs with sidebars and columns" },
-  Creative: { icon: "🎨", color: "#9333ea", desc: "Bold, eye-catching templates that stand out" },
+  Simple: { icon: "ðŸ“„", color: "#059669", desc: "Clean, traditional layouts perfect for corporate roles" },
+  Modern: { icon: "âœ¨", color: "#2563eb", desc: "Contemporary designs with sidebars and columns" },
+  Creative: { icon: "ðŸŽ¨", color: "#9333ea", desc: "Bold, eye-catching templates that stand out" },
 };
 
 export default function TemplateSelect() {
@@ -1348,7 +1348,7 @@ const res = await fetch(`${BASE}/api/resume/`, {
               background: "#f3f4f6", border: "none", borderRadius: "50%", width: 24, height: 24,
               display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer",
               color: "#6b7280", fontSize: 14, fontWeight: 700
-            }}>✕</button>
+            }}>âœ•</button>
           )}
         </div>
 
@@ -1394,7 +1394,7 @@ const res = await fetch(`${BASE}/api/resume/`, {
           <div style={{
             textAlign: "center", padding: "60px 20px", animation: "fadeIn 0.3s ease"
           }}>
-            <div style={{ fontSize: 48, marginBottom: 16 }}>🔍</div>
+            <div style={{ fontSize: 48, marginBottom: 16 }}>ðŸ”</div>
             <div style={{ fontSize: 18, fontWeight: 700, color: "#374151", marginBottom: 8 }}>No templates found</div>
             <div style={{ fontSize: 14, color: "#9ca3af" }}>Try a different search term or filter.</div>
           </div>
@@ -1437,8 +1437,7 @@ const res = await fetch(`${BASE}/api/resume/`, {
               </div>
 
               {/* Card Footer */}
-              <div style={{
-                className="ts-card-footer", padding: "14px 18px 16px",
+              <div className="ts-card-footer" style={{ padding: "14px 18px 16px",
                 borderTop: "1px solid #f0f1f5"
               }}>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
