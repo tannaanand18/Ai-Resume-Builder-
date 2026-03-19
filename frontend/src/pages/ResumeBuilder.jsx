@@ -2816,7 +2816,7 @@ export default function ResumeBuilder() {
           </button>
           <div style={{ width: 1, height: 24, background: "#e2e8f0" }} />
           <input value={resume.title} onChange={e => setResume({ ...resume, title: e.target.value })} placeholder="Resume Title"
-            className="rb-title-input" style={{ border: "none", outline: "none", fontSize: 15, fontWeight: 700, color: "#0f172a", background: "transparent", width: 220, fontFamily: "inherit" }} />
+            className="rb-title-input" className="rb-title-input" style={{ border: "none", outline: "none", fontSize: 15, fontWeight: 700, color: "#0f172a", background: "transparent", width: 220, fontFamily: "inherit" }} />
         </div>
         <div className="rb-navbar-right" style={{ display: "flex", gap: 8, alignItems: "center" }}>
           {/* Template Selector */}
@@ -2897,7 +2897,7 @@ export default function ResumeBuilder() {
       {editingItem && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(15,23,42,0.4)", backdropFilter: "blur(4px)", zIndex: 100, display: "flex", alignItems: "center", justifyContent: "center" }}
           onClick={() => setEditingItem(null)}>
-          <div className="rb-edit-modal" onClick={e => e.stopPropagation()} style={{
+          <div className="rb-edit-modal rb-edit-modal-box" onClick={e => e.stopPropagation()} style={{
             background: "#fff", borderRadius: 16, padding: 28, width: "100%", maxWidth: 520,
             boxShadow: "0 24px 64px rgba(0,0,0,0.15)", border: "1px solid #e2e8f0"
           }}>
