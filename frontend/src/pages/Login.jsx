@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { loginUser } from "../services/authService";
+import { loginUserWithToken } from "../services/authService";
 import { useAuth } from "../context/AuthContext";
 import toast from "react-hot-toast";
 import LoadingScreen from "../components/LoadingScreen";
@@ -22,7 +22,7 @@ export default function Login() {
   setLoading(true);
 
   try {
-    const data = await loginUser(form);
+    const data = await loginUserWithToken(form);
     login(data);
 
     toast.success("Login successful!");
