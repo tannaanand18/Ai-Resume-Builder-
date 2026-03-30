@@ -1,4 +1,4 @@
-import os
+﻿import os
 import pymysql
 pymysql.install_as_MySQLdb()
 
@@ -42,6 +42,8 @@ def create_app(test_config=None):
     app.config["JWT_COOKIE_CSRF_PROTECT"] = False
     app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(days=7)
     app.config["JWT_ACCESS_COOKIE_NAME"] = "access_token_cookie"
+    app.config["JWT_HEADER_NAME"] = "Authorization"
+    app.config["JWT_HEADER_TYPE"] = "Bearer"
 
     # Production (HTTPS) vs Development (HTTP) cookie settings
     is_prod = _is_production_env()
@@ -76,7 +78,7 @@ def create_app(test_config=None):
          supports_credentials=True, 
          origins=allowed_origins,
          allow_headers=["Content-Type", "Authorization", "Cookie", "X-Requested-With"],
-         expose_headers=["Set-Cookie"],
+         expose_headers=["Set-Cookie", "X-Access-Token"],
          methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
          max_age=600)
 
@@ -103,7 +105,7 @@ def create_app(test_config=None):
             response.headers['Access-Control-Allow-Credentials'] = 'true'
             response.headers['Access-Control-Allow-Headers'] = 'Content-Type,Authorization,Cookie,X-Requested-With'
             response.headers['Access-Control-Allow-Methods'] = 'GET,POST,PUT,PATCH,DELETE,OPTIONS'
-            response.headers['Access-Control-Expose-Headers'] = 'Set-Cookie'
+            response.headers['Access-Control-Expose-Headers'] = 'Set-Cookie, X-Access-Token'
         return response
 
     jwt.init_app(app)
@@ -128,3 +130,4 @@ def create_app(test_config=None):
 if __name__ == "__main__":
     app = create_app()
     app.run(debug=True)
+
