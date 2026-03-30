@@ -16,6 +16,8 @@ export const getCurrentUser = async () => {
 };
 
 export const logoutUser = async () => {
+  // Clear token from localStorage on logout
+  localStorage.removeItem('access_token');
   const res = await api.post("/auth/logout", {});
   return res.data;
 };

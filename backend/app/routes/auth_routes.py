@@ -157,6 +157,9 @@ def login():
             path='/'
         )
         
+        # iOS Safari fallback - send token in header too
+        response.headers['X-Access-Token'] = access_token
+        response.headers['Access-Control-Expose-Headers'] = 'X-Access-Token, Set-Cookie'
         response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
 
         print(f"✅ Login successful for: {email}")

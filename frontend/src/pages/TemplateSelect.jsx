@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import api from "../services/api";
 import { useAuth } from "../context/AuthContext";
 import { API_URL } from "../services/api";
 
@@ -1127,25 +1128,15 @@ export default function TemplateSelect() {
 
   const createWithTemplate = async (templateId, templateStyle) => {
     try {
-      const res = await fetch(`${API_URL}/api/resume/`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify({
-          title: "Untitled Resume",
-          template_name: templateId,
-          template_style: templateStyle,
-        }),
+      const res = await api.post("/resume/", {
+        title: "Untitled Resume",
+        template_name: templateId,
+        template_style: templateStyle,
       });
-
-      const data = await res.json();
-      if (!res.ok) throw new Error(data?.error || "Failed to create resume");
-      navigate(`/resume/${data.resume_id}/edit`);
+      navigate(`/resume/${res.data.resume_id}/edit`);
     } catch (err) {
       console.error("Create resume error:", err);
-      alert("Failed to create resume.");
+      alert("Failed to create resume. Please try again.");
     }
   };
 
